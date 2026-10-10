@@ -121,7 +121,7 @@ export async function placeOrder(input: CheckoutInput, ctx: { userId: string | n
                 line1: data.line1, area: data.area, district: data.district, division: data.division, postcode: data.postcode || null,
               },
             },
-            events: { create: { status: "PENDING", note: "Order placed" } },
+            events: { create: { status: "PENDING" } },
           },
         });
 
