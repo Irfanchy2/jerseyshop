@@ -284,3 +284,25 @@ export async function adjustStockAction(input: z.infer<typeof adjustSchema>): Pr
     return fail(e);
   }
 }
+
+const areaSchema = z.object({ x: z.coerce.number().min(0).max(1), y: z.coerce.number().min(0).max(1), w: z.coerce.number().min(0.01).max(1), h: z.coerce.number().min(0.01).max(1) });
+const templateSchema = z.object({
+  id: z.string().optional(), name: z.string().trim().min(2).max(80), modelUrl: z.string().max(500).optional().nullable(),
+  nameArea: areaSchema, numberArea: areaSchema, frontNumberArea: areaSchema.nullable(),
+  allowedColors: z.array(hex).min(1).max(12), allowedFonts: z.array(z.enum(["block", "classic", "modern"])).min(1),
+  price: money, maxNameLength: z.coerce.number().int().min(1).max(20), maxNumberDigits: z.coerce.number().int().min(1).max(3), isActive: z.boolean(),
+});
+
+export async function saveTemplateAction(input: z.infer<typeof templateSchema>): Promise<ActionResult> {
+  try {
+    const staff = await staffAction("products.write");
+    const d = templateSchema.parse(input);
+    const data = { name: d.name, modelUrl: d.modelUrl || null, nameArea: d.nameArea, numberArea: d.numberArea, frontNumberArea: d.frontNumberArea ?? Prisma.DbNull, allowedColors: d.allowedColors, allowedFonts: d.allowedFonts, priceMinor: Math.round(d.price * 100), maxNameLength: d.maxNameLength, maxNumberDigits: d.maxNumberDigits, isActive: d.isActive };
+    const t = d.id ? await db.customizationTemplate.update({ where: { id: d.id }, data }) : await db.customizationTemplate.create({ data });
+    await audit({ actorId: staff.id, action: "template.save", entityType: "customization_template", entityId: t.id, summary: t.name });
+    revalidatePath("/admin/customizer");
+    return { ok: true, message: "Template saved.", id: t.id };
+  } catch (e) {
+    return fail(e);
+  }
+}
