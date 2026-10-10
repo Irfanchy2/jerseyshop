@@ -3,7 +3,9 @@ import type { Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
 import { effectivePrice } from "./pricing";
 
-export const SIZE_ORDER = ["XS", "S", "M", "L", "XL", "XXL", "3XL", "Kids 6-8", "Kids 8-10", "Kids 10-12"];
+import { SIZE_ORDER } from "./sizes";
+
+export { SIZE_ORDER };
 
 export const productCardInclude = {
   images: { orderBy: { sortOrder: "asc" }, take: 2 },
