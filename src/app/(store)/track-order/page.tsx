@@ -13,7 +13,7 @@ export default async function TrackOrderPage({ searchParams }: { searchParams: P
   let error: string | null = null;
   if (number && phone) {
     const ip = (await headers()).get("x-forwarded-for")?.split(",")[0] ?? "local";
-    if (!(await rateLimit(`track:${ip}`, 20, 600))) error = "Too many attempts. Please try again in a few minutes.";
+    if (!(await rateLimit(`order-lookup:${ip}`, 20, 600))) error = "Too many attempts. Please try again in a few minutes.";
     else {
       order = await findOrderByNumberAndPhone(number, phone);
       if (!order) error = "We couldn't find an order with that number and phone. Check both and try again.";

@@ -15,7 +15,7 @@ const schema = z.object({
 });
 
 export const POST = route(async (req) => {
-  if (!(await rateLimit(`track:${await clientIp()}`, 300, 600))) return json({ ok: false }, 429);
+  if (!(await rateLimit(`analytics:${await clientIp()}`, 300, 600))) return json({ ok: false }, 429);
   const body = schema.parse(await req.json());
   const user = await getCustomer();
   await track(body.name, { ...body, userId: user?.id ?? null });
