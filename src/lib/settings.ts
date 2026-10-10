@@ -64,6 +64,8 @@ export const settingSchemas = {
     estimatedCostPerImageMicroUsd: z.number().int().min(0),
     monthlyBudgetMicroUsd: z.number().int().min(0),
     consentVersion: z.string().max(20),
+    // Merchant-owned (properly licensed) sample model photos for customers without a photo.
+    sampleModels: z.array(z.object({ id: z.string().max(40), label: z.string().max(40), key: z.string().max(200) })).max(8),
   }),
   payments: z.object({
     codEnabled: z.boolean(),
@@ -190,6 +192,7 @@ export const DEFAULT_SETTINGS: Settings = {
     estimatedCostPerImageMicroUsd: 60000,
     monthlyBudgetMicroUsd: 50_000_000,
     consentVersion: "2026-10",
+    sampleModels: [],
   },
   payments: {
     codEnabled: true,

@@ -236,7 +236,7 @@ export function Jersey3DViewer({ design, personalisation, view = "front", modelU
       frameloop="demand"
       dpr={[1, 2]}
       shadows
-      camera={{ position: [0, 0.2, 8.4], fov: 35 }}
+      camera={{ position: [0, 0.2, 10.2], fov: 35 }}
       gl={{ antialias: true, preserveDrawingBuffer: true, alpha: true }}
       aria-label="Interactive 3D jersey preview"
     >
@@ -254,7 +254,7 @@ export function Jersey3DViewer({ design, personalisation, view = "front", modelU
         </React.Suspense>
       </Turntable>
       <ContactShadows position={[0, -2.55, 0]} opacity={0.35} scale={9} blur={2.6} far={3} />
-      <OrbitControls enablePan={false} minDistance={5} maxDistance={11} minPolarAngle={Math.PI * 0.3} maxPolarAngle={Math.PI * 0.62} enableDamping />
+      <OrbitControls enablePan={false} minDistance={5.5} maxDistance={13} minPolarAngle={Math.PI * 0.3} maxPolarAngle={Math.PI * 0.62} enableDamping />
       <Snapshot onReady={onReady} />
     </Canvas>
   );
