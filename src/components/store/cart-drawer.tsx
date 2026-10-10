@@ -1,5 +1,6 @@
 "use client";
 
+import { imgSrc, imgSrcSet } from "@/lib/images";
 import * as React from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
@@ -57,7 +58,7 @@ export function CartDrawer() {
                   <motion.li key={l.id} layout initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, height: 0 }} className="flex gap-4 py-5">
                     <Link href={`/products/${l.slug}`} onClick={() => setCartOpen(false)} className="h-28 w-[88px] shrink-0 overflow-hidden rounded-[calc(var(--radius)*0.7)] bg-muted">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      {l.image && <img src={l.image} alt="" className="h-full w-full object-cover" />}
+                      {l.image && <img src={imgSrc(l.image, 320)} alt="" className="h-full w-full object-cover" />}
                     </Link>
                     <div className="flex min-w-0 flex-1 flex-col">
                       <div className="flex justify-between gap-3">

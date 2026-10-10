@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { motion } from "motion/react";
+import { Reveal } from "../reveal";
 import { useStore } from "../store-provider";
 import { SectionHeading } from "../section-heading";
 
@@ -22,7 +22,7 @@ export function ClubNational({ title, teams }: { title: string; teams: Team[] })
               <p className="mb-4 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">{g.label}</p>
               <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
                 {g.items.map((tm, i) => (
-                  <motion.div key={tm.slug} initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.03 }}>
+                  <Reveal key={tm.slug} index={i}>
                     <Link href={`/shop?team=${tm.slug}`} className="group flex items-center gap-3 rounded-[calc(var(--radius)*0.8)] border border-border bg-surface p-3 transition hover:-translate-y-0.5 hover:border-foreground/30 hover:shadow-sm">
                       <span className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full" aria-hidden>
                         <span className="absolute inset-0" style={{ background: tm.primaryHex }} />
@@ -33,7 +33,7 @@ export function ClubNational({ title, teams }: { title: string; teams: Team[] })
                         <span className="block text-[12px] text-muted-foreground">{tm.count} {tm.count === 1 ? "jersey" : "jerseys"}</span>
                       </span>
                     </Link>
-                  </motion.div>
+                  </Reveal>
                 ))}
               </div>
             </div>

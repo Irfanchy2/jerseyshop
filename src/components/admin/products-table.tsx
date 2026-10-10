@@ -1,4 +1,5 @@
 "use client";
+import { imgSrc, imgSrcSet } from "@/lib/images";
 import * as React from "react";
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
@@ -38,7 +39,7 @@ export function ProductsTable({ rows, canWrite }: { rows: Row[]; canWrite: boole
                 <Link href={`/admin/products/${r.id}`} className="flex items-center gap-3">
                   <span className="h-12 w-10 shrink-0 overflow-hidden rounded-md bg-muted">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    {r.image && <img src={r.image} alt="" className="h-full w-full object-cover" />}
+                    {r.image && <img src={imgSrc(r.image, 320)} alt="" className="h-full w-full object-cover" />}
                   </span>
                   <span className="min-w-0"><span className="block truncate font-medium hover:underline">{r.name}</span><span className="text-[12px] text-muted-foreground">{r.team ?? "—"}</span></span>
                 </Link>

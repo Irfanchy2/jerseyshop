@@ -1,5 +1,6 @@
 "use client";
 
+import { imgSrc, imgSrcSet } from "@/lib/images";
 import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -94,7 +95,7 @@ export function SearchOverlay({ open, onOpenChange }: { open: boolean; onOpenCha
                       <Link key={p.id} href={`/products/${p.slug}`} onClick={() => onOpenChange(false)} className="group">
                         <div className="img-zoom aspect-[4/5] overflow-hidden rounded-[var(--radius)] bg-muted">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
-                          {p.image && <img src={p.image} alt="" className="h-full w-full object-cover" />}
+                          {p.image && <img src={imgSrc(p.image, 480)} alt="" className="h-full w-full object-cover" />}
                         </div>
                         <p className="mt-2 line-clamp-2 text-sm font-medium">{p.name}</p>
                         <p className="text-sm text-muted-foreground tabular">{money(p.price)}</p>

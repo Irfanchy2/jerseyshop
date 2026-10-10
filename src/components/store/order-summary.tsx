@@ -1,3 +1,4 @@
+import { imgSrc, imgSrcSet } from "@/lib/images";
 import { Check, Package, Truck, Home, CircleDot, XCircle } from "lucide-react";
 import { formatMoney } from "@/lib/money";
 import { formatDateTime } from "@/lib/utils";
@@ -62,7 +63,7 @@ export function OrderItemsSummary({ order }: { order: Order }) {
             <li key={it.id} className="flex gap-4 py-4">
               <div className="h-20 w-16 shrink-0 overflow-hidden rounded-md bg-muted">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                {it.imageUrl && <img src={it.imageUrl} alt="" className="h-full w-full object-cover" />}
+                {it.imageUrl && <img src={imgSrc(it.imageUrl, 320)} alt="" className="h-full w-full object-cover" />}
               </div>
               <div className="flex-1 text-sm">
                 <p className="font-medium">{it.productName}</p>

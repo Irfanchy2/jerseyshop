@@ -1,3 +1,4 @@
+import { imgSrc, imgSrcSet } from "@/lib/images";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Printer, MapPin, Phone, Mail, User } from "lucide-react";
@@ -55,7 +56,7 @@ export default async function OrderDetail({ params }: { params: Promise<{ id: st
                   <li key={it.id} className="flex gap-4 p-4">
                     <div className="h-20 w-16 shrink-0 overflow-hidden rounded-md bg-muted">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      {it.imageUrl && <img src={it.imageUrl} alt="" className="h-full w-full object-cover" />}
+                      {it.imageUrl && <img src={imgSrc(it.imageUrl, 320)} alt="" className="h-full w-full object-cover" />}
                     </div>
                     <div className="min-w-0 flex-1 text-sm">
                       {it.productId ? <Link href={`/admin/products/${it.productId}`} className="font-medium hover:underline">{it.productName}</Link> : <span className="font-medium">{it.productName}</span>}

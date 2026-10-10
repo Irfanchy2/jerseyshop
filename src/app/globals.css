@@ -192,3 +192,12 @@
 /* Chart series colour: reference categorical slot 1, stepped per mode. */
 .admin-theme { --chart-series-1: #2a78d6; }
 .admin-theme.dark { --chart-series-1: #3987e5; }
+
+/* Scroll reveal (see components/store/reveal.tsx) */
+[data-reveal] { opacity: 0; transform: translateY(24px); transition: opacity .7s var(--ease-out-expo), transform .7s var(--ease-out-expo); transition-delay: calc(var(--reveal-i, 0) * 60ms); }
+[data-reveal][data-revealed="true"] { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { [data-reveal] { opacity: 1; transform: none; } }
+@keyframes word-up { from { transform: translateY(105%); } to { transform: none; } }
+.animate-word-up { animation: word-up .9s var(--ease-out-expo) both; }
+@keyframes rise-in { from { opacity: 0; transform: translateY(60px) scale(.94); } to { opacity: 1; transform: none; } }
+.animate-rise-in { animation: rise-in 1.2s var(--ease-out-expo) both; }

@@ -1,10 +1,11 @@
 "use client";
 
+import { imgSrc, imgSrcSet } from "@/lib/images";
 import * as React from "react";
 import Link from "next/link";
-import { motion } from "motion/react";
 import { Heart, Plus, Eye, Sparkles } from "lucide-react";
 import { useStore } from "./store-provider";
+import { useReveal } from "./reveal";
 import type { ProductCard as Card } from "@/lib/catalog/queries";
 import { cn } from "@/lib/utils";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -44,6 +45,7 @@ export function ProductCard({ p, priority, index = 0 }: { p: Card; priority?: bo
   const [quickView, setQuickView] = React.useState(false);
   const [mobileAdd, setMobileAdd] = React.useState(false);
   const saved = wishlist.has(p.id);
+  const revealRef = useReveal<HTMLElement>();
 
   const quickAdd = async (variantId: string) => {
     setBusy(variantId);
@@ -54,33 +56,27 @@ export function ProductCard({ p, priority, index = 0 }: { p: Card; priority?: bo
   };
 
   return (
-    <motion.article
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-40px" }}
-      transition={{ duration: 0.7, delay: Math.min(index, 6) * 0.06, ease: [0.16, 1, 0.3, 1] }}
-      className="pc group relative"
-    >
+    <article ref={revealRef} data-reveal="" style={{ ["--reveal-i" as string]: Math.min(index, 6) }} className="pc group relative">
       <div className="relative">
       <Link href={`/products/${p.slug}`} className="block" aria-label={p.name}>
         <div className="img-zoom relative overflow-hidden rounded-[var(--radius)] bg-muted" style={{ aspectRatio: "var(--card-ratio, 4/5)" }}>
           {p.image && (
             // Catalog art is vector (SVG) or merchant-uploaded imagery; rendered with native lazy-loading.
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={p.image} alt={p.name} loading={priority ? "eager" : "lazy"} decoding="async" className="absolute inset-0 h-full w-full object-cover transition-opacity duration-500 group-hover:opacity-0" />
+            <img src={imgSrc(p.image, 640)} srcSet={imgSrcSet(p.image)} sizes="(min-width: 1024px) 25vw, 50vw" alt={p.name} loading={priority ? "eager" : "lazy"} fetchPriority={priority && index < 2 ? "high" : "auto"} decoding="async" className="absolute inset-0 h-full w-full object-cover transition-opacity duration-500 group-hover:opacity-0" />
           )}
           {p.hoverImage && (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={p.hoverImage} alt="" aria-hidden loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+            <img src={imgSrc(p.hoverImage, 640)} srcSet={imgSrcSet(p.hoverImage)} sizes="(min-width: 1024px) 25vw, 50vw" alt="" aria-hidden loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
           )}
           <div className="absolute left-3 top-3 flex flex-col items-start gap-1.5">
             {p.percentOff > 0 && <span className="rounded-full bg-sale px-2 py-0.5 text-[11px] font-semibold text-white">−{p.percentOff}%</span>}
-            {p.isNew && <span className="rounded-full bg-surface/90 px-2 py-0.5 text-[11px] font-semibold backdrop-blur">{t.product.new}</span>}
+            {p.isNew && <span className="rounded-full bg-surface px-2 py-0.5 text-[11px] font-semibold">{t.product.new}</span>}
             {!p.inStock && <span className="rounded-full bg-foreground/80 px-2 py-0.5 text-[11px] font-semibold text-background">{t.product.outOfStock}</span>}
           </div>
           {/* Desktop quick add */}
           {p.inStock && (
-            <div className="absolute inset-x-3 bottom-3 hidden translate-y-3 rounded-[calc(var(--radius)*0.8)] bg-surface/95 p-3 opacity-0 shadow-lg backdrop-blur transition-all duration-500 ease-[var(--ease-out-expo)] group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100 md:block">
+            <div className="absolute inset-x-3 bottom-3 hidden translate-y-3 rounded-[calc(var(--radius)*0.8)] bg-surface p-3 opacity-0 shadow-lg transition-all duration-500 ease-[var(--ease-out-expo)] group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100 md:block">
               <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">{t.product.quickAdd}</p>
               <SizePicker p={p} onPick={quickAdd} busy={busy} />
             </div>
@@ -89,18 +85,17 @@ export function ProductCard({ p, priority, index = 0 }: { p: Card; priority?: bo
       </Link>
 
       <div className="absolute right-3 top-3 flex flex-col gap-2">
-        <motion.button
-          whileTap={{ scale: 0.85 }}
+        <button
           onClick={() => toggleWishlist(p.id, p.name)}
-          className="grid h-9 w-9 place-items-center rounded-full bg-surface/90 shadow-sm backdrop-blur transition hover:bg-surface"
+          className="grid h-9 w-9 place-items-center rounded-full bg-surface shadow-sm transition hover:scale-105 active:scale-90"
           aria-label={saved ? `Remove ${p.name} from wishlist` : `Save ${p.name} to wishlist`}
           aria-pressed={saved}
         >
           <Heart className={cn("h-4 w-4 transition", saved && "fill-sale text-sale")} />
-        </motion.button>
+        </button>
         <button
           onClick={() => setQuickView(true)}
-          className="hidden h-9 w-9 place-items-center rounded-full bg-surface/90 opacity-0 shadow-sm backdrop-blur transition group-hover:opacity-100 focus:opacity-100 md:grid"
+          className="hidden h-9 w-9 place-items-center rounded-full bg-surface opacity-0 shadow-sm transition group-hover:opacity-100 focus:opacity-100 md:grid"
           aria-label={`${t.product.quickView}: ${p.name}`}
         >
           <Eye className="h-4 w-4" />
@@ -145,12 +140,12 @@ export function ProductCard({ p, priority, index = 0 }: { p: Card; priority?: bo
         </div>
       </div>
 
-      <Dialog open={quickView} onOpenChange={setQuickView}>
+      {quickView && <Dialog open={quickView} onOpenChange={setQuickView}>
         <DialogContent title={p.name} className="max-w-3xl p-0" showTitle={false}>
           <div className="grid md:grid-cols-2">
             <div className="aspect-[4/5] bg-muted">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              {p.image && <img src={p.image} alt={p.name} className="h-full w-full object-cover" />}
+              {p.image && <img src={imgSrc(p.image, 960)} alt={p.name} className="h-full w-full object-cover" />}
             </div>
             <div className="flex flex-col p-6 md:p-8">
               <p className="text-[13px] text-muted-foreground">{[p.teamName ?? p.categoryName, p.season].filter(Boolean).join(" · ")}</p>
@@ -169,9 +164,9 @@ export function ProductCard({ p, priority, index = 0 }: { p: Card; priority?: bo
             </div>
           </div>
         </DialogContent>
-      </Dialog>
+      </Dialog>}
 
-      <Sheet open={mobileAdd} onOpenChange={setMobileAdd}>
+      {mobileAdd && <Sheet open={mobileAdd} onOpenChange={setMobileAdd}>
         <SheetContent side="bottom" title={t.product.selectSize}>
           <div className="p-6 pb-10">
             <p className="font-heading text-lg font-bold">{p.name}</p>
@@ -180,8 +175,8 @@ export function ProductCard({ p, priority, index = 0 }: { p: Card; priority?: bo
             <SizePicker p={p} onPick={quickAdd} busy={busy} />
           </div>
         </SheetContent>
-      </Sheet>
-    </motion.article>
+      </Sheet>}
+    </article>
   );
 }
 

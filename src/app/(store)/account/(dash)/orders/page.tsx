@@ -1,3 +1,4 @@
+import { imgSrc, imgSrcSet } from "@/lib/images";
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { requireCustomer } from "@/lib/auth/guards";
@@ -35,7 +36,7 @@ export default async function OrdersPage({ searchParams }: { searchParams: Promi
                 {o.items.map((it) => (
                   <div key={it.id} className="flex items-center gap-2 rounded-lg bg-muted/60 p-1.5 pr-3 text-[13px]">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    {it.imageUrl && <img src={it.imageUrl} alt="" className="h-10 w-8 rounded object-cover" />}
+                    {it.imageUrl && <img src={imgSrc(it.imageUrl, 320)} alt="" className="h-10 w-8 rounded object-cover" />}
                     <span>{it.productName} · {it.size}</span>
                     {o.status === "DELIVERED" && it.productId && !reviewed.has(it.productId) && <Link href={`/account/orders?review=${it.productId}`} className="ml-1 font-semibold underline">Review</Link>}
                   </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { imgSrc, imgSrcSet } from "@/lib/images";
 import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -251,7 +252,7 @@ export function CheckoutForm({
                 <li key={l.id} className="flex gap-3">
                   <div className="relative h-20 w-16 shrink-0 overflow-hidden rounded-md bg-muted">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    {l.image && <img src={l.image} alt="" className="h-full w-full object-cover" />}
+                    {l.image && <img src={imgSrc(l.image, 320)} alt="" className="h-full w-full object-cover" />}
                     <span className="absolute -right-0 -top-0 grid h-5 min-w-5 place-items-center rounded-bl-md bg-foreground px-1 text-[10px] font-bold text-background">{l.quantity}</span>
                   </div>
                   <div className="min-w-0 flex-1 text-sm">

@@ -7,7 +7,7 @@ import { applyTestEnv } from "./env";
  */
 export default function setup() {
   applyTestEnv();
-  const env = { ...process.env, NODE_ENV: "test" };
+  const env: NodeJS.ProcessEnv = { ...process.env, NODE_ENV: "test" };
   execSync("npx prisma migrate deploy", { stdio: "inherit", env });
   execSync("npx tsx prisma/seed.ts --demo", { stdio: "inherit", env });
 }

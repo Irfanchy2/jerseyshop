@@ -2,7 +2,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { db } from "@/lib/db";
 import { randomToken, sha256 } from "@/lib/crypto";
 import { placeOrder, type CheckoutInput } from "@/lib/checkout/place-order";
-import { priceCart } from "@/lib/cart/server";
+import { findCart, priceCart } from "@/lib/cart/server";
 import { createShipment } from "@/lib/couriers/service";
 import { withCookies } from "../support/setup";
 
@@ -34,7 +34,7 @@ beforeAll(async () => {
 describe("checkout", () => {
   it("prices the cart on the server, including delivery by district", async () => {
     const jar = await cartWith(variantId, 1);
-    const priced = await withCookies(jar, async () => priceCart((await import("@/lib/cart/server")).findCart ? await (await import("@/lib/cart/server")).findCart() : null, { district: "Sylhet" }));
+    const priced = await withCookies(jar, async () => priceCart(await findCart(), { district: "Sylhet" }));
     expect(priced.subtotalMinor).toBe(189000);
     expect(priced.shipping.code).toBe("outside_dhaka");
     expect(priced.totalMinor).toBe(189000 + 13000);

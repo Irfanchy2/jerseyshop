@@ -1,5 +1,6 @@
 "use client";
 
+import { imgSrc, imgSrcSet } from "@/lib/images";
 import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -305,7 +306,7 @@ export function TryOnStudio({ products, initialSlug, status, signedIn }: { produ
                 <div className="max-w-sm">
                   {product?.image && (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={`${product.image}?bg=none`} alt="" className="mx-auto h-56 w-auto opacity-90 drop-shadow-xl" />
+                    <img src={imgSrc(product.image, 640, { transparent: true })} alt="" className="mx-auto h-56 w-auto opacity-90 drop-shadow-xl" />
                   )}
                   <p className="mt-4 font-heading text-lg font-semibold">Your AI preview will appear here</p>
                   <p className="mt-1 text-sm text-muted-foreground">Upload a photo, agree to the terms and press Generate.</p>
@@ -356,7 +357,7 @@ export function TryOnStudio({ products, initialSlug, status, signedIn }: { produ
             <div className="flex gap-4">
               <div className="h-28 w-24 shrink-0 overflow-hidden rounded-lg bg-muted">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                {product.image && <img src={product.image} alt="" className="h-full w-full object-cover" />}
+                {product.image && <img src={imgSrc(product.image, 320)} alt="" className="h-full w-full object-cover" />}
               </div>
               <div>
                 <Link href={`/products/${product.slug}`} className="font-medium leading-snug hover:underline">{product.name}</Link>
@@ -371,7 +372,7 @@ export function TryOnStudio({ products, initialSlug, status, signedIn }: { produ
               {products.map((p) => (
                 <button key={p.id} onClick={() => { setProductId(p.id); setSize(null); if (step === 1) setStep(2); }} aria-pressed={p.id === productId} title={p.name} className={cn("aspect-[4/5] overflow-hidden rounded-md bg-muted ring-offset-2 transition", p.id === productId ? "ring-2 ring-foreground" : "opacity-75 hover:opacity-100")}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  {p.image && <img src={p.image} alt={p.name} className="h-full w-full object-cover" />}
+                  {p.image && <img src={imgSrc(p.image, 320)} alt={p.name} className="h-full w-full object-cover" />}
                 </button>
               ))}
             </div>

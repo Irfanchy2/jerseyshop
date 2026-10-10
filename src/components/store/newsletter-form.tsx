@@ -44,7 +44,7 @@ export function NewsletterForm({ source = "footer", tone = "light" }: { source?:
         </button>
       </div>
       {state === "error" && <p className="mt-2 text-xs text-danger" role="alert">{error}</p>}
-      <p className="mt-2 text-[11px] opacity-60">By subscribing you agree to receive marketing emails. Unsubscribe anytime.</p>
+      <p className="mt-2 text-[11px] opacity-80">By subscribing you agree to receive marketing emails. Unsubscribe anytime.</p>
     </form>
   );
 }

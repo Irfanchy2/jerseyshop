@@ -1,6 +1,7 @@
 "use client";
+import { imgSrc, imgSrcSet } from "@/lib/images";
 import Link from "next/link";
-import { motion } from "motion/react";
+import { Reveal } from "../reveal";
 import { useStore } from "../store-provider";
 import { SectionHeading } from "../section-heading";
 
@@ -15,7 +16,7 @@ export function FeaturedCollections({ title, collections }: { title: string; col
         <SectionHeading title={title} href="/collections" linkLabel={locale === "bn" ? "সব কালেকশন" : "All collections"} />
         <div className="grid gap-4 md:grid-cols-3 md:gap-5">
           {collections.map((col, i) => (
-            <motion.div key={col.slug} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.9, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }} >
+            <Reveal key={col.slug} index={i}>
               <Link href={`/collections/${col.slug}`} className="group relative flex aspect-[4/5] flex-col justify-end overflow-hidden rounded-[var(--radius)] p-6 text-white md:p-8" style={{ background: col.accentHex ?? "#1f2937" }}>
                 {col.imageUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
@@ -24,7 +25,7 @@ export function FeaturedCollections({ title, collections }: { title: string; col
                   <div className="absolute inset-x-0 top-0 flex h-[66%] items-center justify-center px-6">
                     {col.images.slice(0, 3).map((src, k) => (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img key={k} src={`${src}?bg=none`} alt="" loading="lazy" className="-mx-[5%] w-[42%] transition-transform duration-[1.2s] ease-[var(--ease-out-expo)] group-hover:-translate-y-2" style={{ transform: `rotate(${(k - 1) * 7}deg) translateY(${k === 1 ? 0 : 18}px)`, zIndex: k === 1 ? 2 : 1 }} />
+                      <img key={k} src={imgSrc(src, 480, { transparent: true })} srcSet={imgSrcSet(src, { transparent: true })} sizes="15vw" alt="" loading="lazy" className="-mx-[5%] w-[42%] transition-transform duration-[1.2s] ease-[var(--ease-out-expo)] group-hover:-translate-y-2" style={{ transform: `rotate(${(k - 1) * 7}deg) translateY(${k === 1 ? 0 : 18}px)`, zIndex: k === 1 ? 2 : 1 }} />
                     ))}
                   </div>
                 )}
@@ -36,7 +37,7 @@ export function FeaturedCollections({ title, collections }: { title: string; col
                   <span className="mt-4 inline-block border-b border-white/60 pb-0.5 text-sm font-semibold transition group-hover:border-white">Shop collection</span>
                 </div>
               </Link>
-            </motion.div>
+            </Reveal>
           ))}
         </div>
       </div>

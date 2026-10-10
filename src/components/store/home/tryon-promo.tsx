@@ -1,6 +1,7 @@
 "use client";
+import { imgSrc, imgSrcSet } from "@/lib/images";
 import Link from "next/link";
-import { motion } from "motion/react";
+import { Reveal } from "../reveal";
 import { ArrowRight, Camera, Shirt, Sparkles, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { SectionContent } from "@/lib/cms/sections";
@@ -35,18 +36,18 @@ export function TryOnPromo({ c, jerseyImage }: { c: SectionContent<"tryon_promo"
           <div className="relative">
             <div className="grid gap-3 sm:grid-cols-3">
               {steps.map((s, i) => (
-                <motion.div key={i} initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.12, duration: 0.8, ease: [0.16, 1, 0.3, 1] }} className="rounded-[var(--radius)] bg-white p-5">
+                <Reveal key={i} index={i} className="rounded-[var(--radius)] bg-white p-5">
                   <span className="text-[11px] font-bold text-[#0f1320]/40">0{i + 1}</span>
                   <s.icon className="mt-6 h-6 w-6" />
                   <p className="mt-3 font-heading font-bold">{s.title}</p>
                   <p className="text-[13px] text-[#0f1320]/60">{s.body}</p>
-                </motion.div>
+                </Reveal>
               ))}
             </div>
             {jerseyImage && (
               <div className="mt-3 flex items-center gap-4 rounded-[var(--radius)] bg-white/60 p-4">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={`${jerseyImage}?bg=none`} alt="" className="h-20 w-auto" loading="lazy" />
+                <img src={imgSrc(jerseyImage, 320, { transparent: true })} alt="" className="h-20 w-auto" loading="lazy" />
                 <p className="text-[13px] text-[#0f1320]/70">Generated images are labelled as AI previews and are not an exact representation of fit, size or fabric.</p>
               </div>
             )}

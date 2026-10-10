@@ -40,8 +40,8 @@ export function Footer({ settings, t, locale, categories, demoData }: { settings
             <FooterLink href="/privacy-policy">{t.footer.privacy}</FooterLink>
             <FooterLink href="/terms">{t.footer.terms}</FooterLink>
             <li className="pt-2 text-sm text-muted-foreground">
-              <a href={`tel:${settings.brand.supportPhone.replace(/[^+\d]/g, "")}`} className="block hover:text-foreground">{settings.brand.supportPhone}</a>
-              <a href={`mailto:${settings.brand.supportEmail}`} className="block hover:text-foreground">{settings.brand.supportEmail}</a>
+              <a href={`tel:${settings.brand.supportPhone.replace(/[^+\d]/g, "")}`} className="block py-1 hover:text-foreground">{settings.brand.supportPhone}</a>
+              <a href={`mailto:${settings.brand.supportEmail}`} className="block py-1 hover:text-foreground">{settings.brand.supportEmail}</a>
             </li>
           </FooterCol>
         </nav>

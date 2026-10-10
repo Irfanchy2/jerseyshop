@@ -1,3 +1,4 @@
+import { imgSrc, imgSrcSet } from "@/lib/images";
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { publishedWhere } from "@/lib/catalog/queries";
@@ -28,7 +29,7 @@ export default async function CollectionsPage() {
               ) : (
                 c.products.map((p, k) => p.product.images[0] && (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img key={p.productId} src={`${p.product.images[0].url}?bg=none`} alt="" loading="lazy" className="-mx-[5%] w-[42%] transition duration-700 group-hover:-translate-y-2" style={{ transform: `rotate(${(k - 1) * 7}deg)`, zIndex: k === 1 ? 2 : 1 }} />
+                  <img key={p.productId} src={imgSrc(p.product.images[0].url, 480, { transparent: true })} alt="" loading="lazy" className="-mx-[5%] w-[42%] transition duration-700 group-hover:-translate-y-2" style={{ transform: `rotate(${(k - 1) * 7}deg)`, zIndex: k === 1 ? 2 : 1 }} />
                 ))
               )}
             </div>

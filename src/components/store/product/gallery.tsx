@@ -1,5 +1,6 @@
 "use client";
 
+import { imgSrc, imgSrcSet } from "@/lib/images";
 import * as React from "react";
 import dynamic from "next/dynamic";
 import { AnimatePresence, motion } from "motion/react";
@@ -40,7 +41,7 @@ export function Gallery({ images, name, design, has3d }: { images: Img[]; name: 
             className={cn("relative aspect-[4/5] w-[72px] shrink-0 overflow-hidden rounded-[calc(var(--radius)*0.6)] bg-muted ring-offset-2 ring-offset-background transition lg:w-full", mode === "image" && i === active ? "ring-2 ring-foreground" : "opacity-70 hover:opacity-100")}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={im.url} alt="" className="h-full w-full object-cover" />
+            <img src={imgSrc(im.url, 320)} alt="" className="h-full w-full object-cover" />
             <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/40 to-transparent py-1 text-center text-[10px] font-semibold capitalize text-white">{im.kind.toLowerCase()}</span>
           </button>
         ))}
@@ -73,7 +74,9 @@ export function Gallery({ images, name, design, has3d }: { images: Img[]; name: 
             <AnimatePresence mode="popLayout" initial={false}>
               <motion.img
                 key={img?.url}
-                src={img?.url}
+                src={imgSrc(img?.url, 1280)}
+                srcSet={imgSrcSet(img?.url)}
+                sizes="(min-width: 1024px) 55vw, 100vw"
                 alt={img?.alt ?? name}
                 initial={{ opacity: 0, scale: 1.02 }}
                 animate={{ opacity: 1, scale: zoom ? 1.9 : 1 }}

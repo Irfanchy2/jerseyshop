@@ -25,7 +25,8 @@ const safeKey = (key: string) => {
 
 class LocalStorage implements Storage {
   kind = "local" as const;
-  root = path.resolve(process.cwd(), process.env.LOCAL_STORAGE_DIR ?? ".storage");
+  // Runtime data directory (not source) — excluded from output file tracing.
+  root = path.resolve(/*turbopackIgnore: true*/ process.cwd(), process.env.LOCAL_STORAGE_DIR ?? ".storage");
   async put(key: string, body: Buffer, contentType: string) {
     const file = path.join(this.root, safeKey(key));
     await fs.mkdir(path.dirname(file), { recursive: true });

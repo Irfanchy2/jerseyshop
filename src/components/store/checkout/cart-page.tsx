@@ -1,4 +1,5 @@
 "use client";
+import { imgSrc, imgSrcSet } from "@/lib/images";
 import Link from "next/link";
 import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
 import { useStore } from "../store-provider";
@@ -28,7 +29,7 @@ export function CartPageClient() {
             <li key={l.id} className="flex gap-5 py-6">
               <Link href={`/products/${l.slug}`} className="h-36 w-28 shrink-0 overflow-hidden rounded-[calc(var(--radius)*0.7)] bg-muted">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                {l.image && <img src={l.image} alt="" className="h-full w-full object-cover" />}
+                {l.image && <img src={imgSrc(l.image, 320)} alt="" className="h-full w-full object-cover" />}
               </Link>
               <div className="flex flex-1 flex-col">
                 <div className="flex justify-between gap-4">
