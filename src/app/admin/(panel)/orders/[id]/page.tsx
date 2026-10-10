@@ -134,7 +134,7 @@ export default async function OrderDetail({ params }: { params: Promise<{ id: st
         <div className="space-y-4">
           {staff.permissions.has("orders.write") && (
             <Card title="Update status">
-              <OrderStatusForm orderId={order.id} current={order.status} next={ALLOWED_TRANSITIONS[order.status]} />
+              <OrderStatusForm key={order.status} orderId={order.id} current={order.status} next={ALLOWED_TRANSITIONS[order.status]} />
             </Card>
           )}
           <Card title="Customer">

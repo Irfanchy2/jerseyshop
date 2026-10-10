@@ -88,11 +88,13 @@ export function Header({ brand, announcement, nav }: { brand: { name: string; lo
     return () => window.removeEventListener("scroll", handler);
   }, []);
 
-  React.useEffect(() => {
+  const [lastPath, setLastPath] = React.useState(pathname);
+  if (lastPath !== pathname) {
+    setLastPath(pathname);
     setMega(null);
     setMobileOpen(false);
     setSearchOpen(false);
-  }, [pathname]);
+  }
 
   const openMega = (k: typeof mega) => {
     if (closeTimer.current) clearTimeout(closeTimer.current);

@@ -6,6 +6,17 @@ import { Button } from "@/components/ui/button";
 
 type Ids = { ga4Id: string; gtmId: string; metaPixelId: string; tiktokPixelId: string; requireConsent: boolean };
 const KEY = "js_consent";
+const consentListeners = new Set<() => void>();
+const subscribeConsent = (l: () => void) => {
+  consentListeners.add(l);
+  return () => {
+    consentListeners.delete(l);
+  };
+};
+const readConsent = (): "granted" | "denied" | null => {
+  const m = document.cookie.match(/(?:^|; )js_consent=(granted|denied)/);
+  return m ? (m[1] as "granted" | "denied") : null;
+};
 const safeId = (s: string) => /^[A-Za-z0-9_-]{3,40}$/.test(s);
 
 /**
@@ -14,15 +25,12 @@ const safeId = (s: string) => /^[A-Za-z0-9_-]{3,40}$/.test(s);
  */
 export function ConsentAndPixels({ ids }: { ids: Ids }) {
   const any = [ids.ga4Id, ids.gtmId, ids.metaPixelId, ids.tiktokPixelId].some((x) => x && safeId(x));
-  const [consent, setConsent] = React.useState<"granted" | "denied" | null>(null);
-  React.useEffect(() => {
-    const m = document.cookie.match(/(?:^|; )js_consent=(granted|denied)/);
-    setConsent(m ? (m[1] as "granted" | "denied") : ids.requireConsent ? null : "granted");
-  }, [ids.requireConsent]);
-  if (!any) return null;
+  const stored = React.useSyncExternalStore(subscribeConsent, readConsent, () => "unknown" as const);
+  const consent = stored === "unknown" ? "unknown" : stored ?? (ids.requireConsent ? null : "granted");
+  if (!any || consent === "unknown") return null;
   const decide = (v: "granted" | "denied") => {
     document.cookie = `${KEY}=${v}; path=/; max-age=${60 * 60 * 24 * 365}; samesite=lax`;
-    setConsent(v);
+    consentListeners.forEach((l) => l());
   };
   return (
     <>

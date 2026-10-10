@@ -213,24 +213,25 @@ function Snapshot({ onReady }: { onReady?: Props["onReady"] }) {
   return null;
 }
 
-export function Jersey3DViewer({ design, personalisation, view = "front", modelUrl, autoRotate = true, onReady }: Props) {
-  const [webgl, setWebgl] = React.useState<boolean | null>(null);
-  const [fallbackView, setFallbackView] = React.useState<"front" | "back">(view);
-  React.useEffect(() => setWebgl(supportsWebGL()), []);
-  React.useEffect(() => setFallbackView(view), [view]);
+const noopSubscribe = () => () => {};
 
+/** 2D fallback for devices without WebGL. */
+function Fallback({ design, personalisation, initialView }: { design: JerseyDesign; personalisation?: Personalisation; initialView: "front" | "back" }) {
+  const [fallbackView, setFallbackView] = React.useState(initialView);
+  const svg = jerseySvg(design, fallbackView, { backdrop: null, name: personalisation?.name, number: personalisation?.number, textColor: personalisation?.textColor });
+  return (
+    <div className="flex h-full w-full flex-col items-center justify-center gap-3 p-6">
+      <div className="w-full max-w-sm [&_svg]:h-auto [&_svg]:w-full" dangerouslySetInnerHTML={{ __html: svg }} />
+      <button className="text-sm underline" onClick={() => setFallbackView((v) => (v === "front" ? "back" : "front"))}>Show {fallbackView === "front" ? "back" : "front"}</button>
+      <p className="text-xs text-muted-foreground">3D preview isn&apos;t supported on this device — showing a 2D preview.</p>
+    </div>
+  );
+}
+
+export function Jersey3DViewer({ design, personalisation, view = "front", modelUrl, autoRotate = true, onReady }: Props) {
+  const webgl = React.useSyncExternalStore(noopSubscribe, supportsWebGL, () => null);
   if (webgl === null) return <div className="skeleton h-full w-full" />;
-  if (!webgl) {
-    // 2D fallback for devices without WebGL.
-    const svg = jerseySvg(design, fallbackView, { backdrop: null, name: personalisation?.name, number: personalisation?.number, textColor: personalisation?.textColor });
-    return (
-      <div className="flex h-full w-full flex-col items-center justify-center gap-3 p-6">
-        <div className="w-full max-w-sm [&_svg]:h-auto [&_svg]:w-full" dangerouslySetInnerHTML={{ __html: svg }} />
-        <button className="text-sm underline" onClick={() => setFallbackView((v) => (v === "front" ? "back" : "front"))}>Show {fallbackView === "front" ? "back" : "front"}</button>
-        <p className="text-xs text-muted-foreground">3D preview isn&apos;t supported on this device — showing a 2D preview.</p>
-      </div>
-    );
-  }
+  if (!webgl) return <Fallback key={view} design={design} personalisation={personalisation} initialView={view} />;
   return (
     <Canvas
       frameloop="demand"

@@ -69,6 +69,7 @@ export function AdminShell({
   brand,
   notifications,
   unread,
+  prefs,
 }: {
   children: React.ReactNode;
   user: { name: string; email: string; roleName: string };
@@ -76,34 +77,32 @@ export function AdminShell({
   brand: string;
   notifications: Notif[];
   unread: number;
+  prefs: { collapsed: boolean; dark: boolean };
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  const [collapsed, setCollapsed] = React.useState(false);
-  const [dark, setDark] = React.useState(false);
+  // Preferences live in cookies so the server renders the right theme with no flash.
+  const [collapsed, setCollapsed] = React.useState(prefs.collapsed);
+  const [dark, setDark] = React.useState(prefs.dark);
   const [mobile, setMobile] = React.useState(false);
   const [q, setQ] = React.useState("");
 
-  React.useEffect(() => {
-    try {
-      setCollapsed(localStorage.getItem("admin:collapsed") === "1");
-      const stored = localStorage.getItem("admin:theme");
-      setDark(stored ? stored === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches);
-    } catch {}
-  }, []);
-  React.useEffect(() => setMobile(false), [pathname]);
+  const [lastPath, setLastPath] = React.useState(pathname);
+  if (lastPath !== pathname) {
+    setLastPath(pathname);
+    setMobile(false);
+  }
+  const savePref = (k: string, v: string) => {
+    document.cookie = `${k}=${v}; path=/admin; max-age=${60 * 60 * 24 * 365}; samesite=lax`;
+  };
 
   const toggleCollapsed = () => {
-    setCollapsed((c) => {
-      try { localStorage.setItem("admin:collapsed", c ? "0" : "1"); } catch {}
-      return !c;
-    });
+    savePref("admin_collapsed", collapsed ? "0" : "1");
+    setCollapsed(!collapsed);
   };
   const toggleDark = () => {
-    setDark((d) => {
-      try { localStorage.setItem("admin:theme", d ? "light" : "dark"); } catch {}
-      return !d;
-    });
+    savePref("admin_theme", dark ? "light" : "dark");
+    setDark(!dark);
   };
 
   const can = (p?: string) => !p || permissions.includes(p);

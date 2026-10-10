@@ -9,5 +9,11 @@ export function ThemeStyle({ appearance }: { appearance: Settings["appearance"] 
   const c = appearance.colors;
   const btnRadius = appearance.buttonStyle === "sharp" ? "0px" : appearance.buttonStyle === "outline-pill" ? "999px" : appearance.radius === "none" ? "0px" : "999px";
   const css = `:root{--background:${c.background};--surface:${c.surface};--muted:${c.muted};--foreground:${c.foreground};--muted-foreground:${c.mutedForeground};--border:${c.border};--accent:${c.accent};--accent-foreground:${c.accentForeground};--sale:${c.sale};--radius:${radius[appearance.radius]};--radius-button:${btnRadius};--section-gap:${gaps[appearance.sectionSpacing]};--heading-transform:${appearance.headingCase === "uppercase" ? "uppercase" : "none"};--font-heading-family:${fontVar[appearance.headingFont]};--font-body-family:${fontVar[appearance.bodyFont]};--card-ratio:${appearance.cardImageRatio};}`;
-  return <style dangerouslySetInnerHTML={{ __html: css }} />;
+  const card =
+    appearance.cardStyle === "framed"
+      ? ".pc{border:1px solid var(--border);padding:.5rem;border-radius:calc(var(--radius) + .5rem);background:var(--surface)}"
+      : appearance.cardStyle === "elevated"
+        ? ".pc{padding:.5rem;border-radius:calc(var(--radius) + .5rem);background:var(--surface);box-shadow:0 10px 30px -14px rgba(0,0,0,.18)}"
+        : "";
+  return <style dangerouslySetInnerHTML={{ __html: css + card }} />;
 }

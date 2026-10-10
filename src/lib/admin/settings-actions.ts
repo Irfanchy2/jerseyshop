@@ -163,3 +163,48 @@ export async function saveSecretAction(key: "payments.sslcommerz" | "tryon.googl
     return fail(e);
   }
 }
+
+export async function testTryOnProviderAction(): Promise<ActionResult> {
+  try {
+    await staffAction("tryon.manage");
+    const { resolveProvider } = await import("@/lib/tryon/service");
+    const { provider, reason } = await resolveProvider();
+    if (!provider.isReal) return { ok: false, error: `Demo mode: ${reason ?? "no AI provider configured"}` };
+    // Verify credentials by obtaining an OAuth token (no image generation, no cost).
+    const { getSecret } = await import("@/lib/secrets");
+    const secret = await getSecret<{ serviceAccountJson: string }>("tryon.google");
+    const sa = JSON.parse(secret?.serviceAccountJson ?? process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON ?? "{}");
+    const { createSign } = await import("node:crypto");
+    const now = Math.floor(Date.now() / 1000);
+    const b64 = (o: object) => Buffer.from(JSON.stringify(o)).toString("base64url");
+    const unsigned = `${b64({ alg: "RS256", typ: "JWT" })}.${b64({ iss: sa.client_email, scope: "https://www.googleapis.com/auth/cloud-platform", aud: "https://oauth2.googleapis.com/token", iat: now, exp: now + 600 })}`;
+    const sig = createSign("RSA-SHA256").update(unsigned).sign(sa.private_key).toString("base64url");
+    const res = await fetch("https://oauth2.googleapis.com/token", { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: new URLSearchParams({ grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer", assertion: `${unsigned}.${sig}` }), signal: AbortSignal.timeout(15000) });
+    if (!res.ok) return { ok: false, error: `Google rejected the service account (HTTP ${res.status}).` };
+    return { ok: true, message: `Credentials valid for ${sa.client_email}. Make sure the Vertex AI API is enabled and the model is available in your region.` };
+  } catch (e) {
+    return fail(e);
+  }
+}
+
+export async function saveSampleModelAction(fd: FormData): Promise<ActionResult> {
+  try {
+    const staff = await staffAction("tryon.manage");
+    const file = fd.get("file");
+    const label = String(fd.get("label") ?? "").trim().slice(0, 40);
+    if (!(file instanceof File) || !label) return { ok: false, error: "Add a label and a photo." };
+    if (fd.get("rights") !== "on") return { ok: false, error: "Confirm you have the rights and the model's consent to use this photo." };
+    const { storeUpload } = await import("./media");
+    const asset = await storeUpload(file, "tryon-models", staff.id, label);
+    const { getSetting } = await import("@/lib/settings");
+    const tryon = await getSetting("tryon");
+    const next = { ...tryon, sampleModels: [...tryon.sampleModels, { id: asset.id.slice(-10), label, key: asset.key }].slice(0, 8) };
+    const { saveSetting } = await import("@/lib/settings");
+    await saveSetting("tryon", next, { actorId: staff.id });
+    await audit({ actorId: staff.id, action: "tryon.sample_model.add", entityType: "setting", entityId: "tryon", summary: label });
+    revalidatePath("/admin/try-on");
+    return { ok: true, message: "Sample model added." };
+  } catch (e) {
+    return fail(e);
+  }
+}

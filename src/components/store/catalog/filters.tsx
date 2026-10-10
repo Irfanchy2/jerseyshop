@@ -74,12 +74,6 @@ function CheckRow({ label, checked, onChange, swatch }: { label: string; checked
 export function FilterPanel({ facets, hideCategory }: { facets: Facets; hideCategory?: boolean }) {
   const { t, locale } = useStore();
   const { sp, set, list, toggle } = useFilterNav();
-  const [min, setMin] = React.useState(sp.get("min") ?? "");
-  const [max, setMax] = React.useState(sp.get("max") ?? "");
-  React.useEffect(() => {
-    setMin(sp.get("min") ?? "");
-    setMax(sp.get("max") ?? "");
-  }, [sp]);
   const category = sp.get("category");
   const clubs = facets.teams.filter((x) => x.kind === "CLUB");
   const nations = facets.teams.filter((x) => x.kind === "NATIONAL");
@@ -138,33 +132,30 @@ export function FilterPanel({ facets, hideCategory }: { facets: Facets; hideCate
         </div>
       </Group>
       <Group title={t.shop.price}>
-        <form
-          className="flex items-end gap-2"
-          onSubmit={(e) => {
-            e.preventDefault();
-            set((p) => {
-              if (min) p.set("min", min);
-              else p.delete("min");
-              if (max) p.set("max", max);
-              else p.delete("max");
-            });
-          }}
-        >
-          <label className="flex-1 text-[12px] text-muted-foreground">
-            Min ৳
-            <input inputMode="numeric" value={min} onChange={(e) => setMin(e.target.value.replace(/\D/g, ""))} placeholder={String(Math.floor(facets.priceRange.min / 100))} className="mt-1 h-10 w-full rounded-lg border border-border bg-surface px-3 text-sm text-foreground" />
-          </label>
-          <label className="flex-1 text-[12px] text-muted-foreground">
-            Max ৳
-            <input inputMode="numeric" value={max} onChange={(e) => setMax(e.target.value.replace(/\D/g, ""))} placeholder={String(Math.ceil(facets.priceRange.max / 100))} className="mt-1 h-10 w-full rounded-lg border border-border bg-surface px-3 text-sm text-foreground" />
-          </label>
-          <Button type="submit" size="sm" variant="outline" className="h-10">Go</Button>
-        </form>
+        <PriceRange key={`${sp.get("min") ?? ""}-${sp.get("max") ?? ""}`} initialMin={sp.get("min") ?? ""} initialMax={sp.get("max") ?? ""} range={facets.priceRange} onApply={(mn, mx) => set((p) => { if (mn) p.set("min", mn); else p.delete("min"); if (mx) p.set("max", mx); else p.delete("max"); })} />
       </Group>
       <Group title={t.shop.availability}>
         <CheckRow label={t.shop.inStockOnly} checked={sp.get("stock") === "1"} onChange={() => set((p) => (p.get("stock") === "1" ? p.delete("stock") : p.set("stock", "1")))} />
       </Group>
     </div>
+  );
+}
+
+function PriceRange({ initialMin, initialMax, range, onApply }: { initialMin: string; initialMax: string; range: { min: number; max: number }; onApply: (min: string, max: string) => void }) {
+  const [min, setMin] = React.useState(initialMin);
+  const [max, setMax] = React.useState(initialMax);
+  return (
+    <form className="flex items-end gap-2" onSubmit={(e) => { e.preventDefault(); onApply(min, max); }}>
+      <label className="flex-1 text-[12px] text-muted-foreground">
+        Min ৳
+        <input inputMode="numeric" value={min} onChange={(e) => setMin(e.target.value.replace(/\D/g, ""))} placeholder={String(Math.floor(range.min / 100))} className="mt-1 h-10 w-full rounded-lg border border-border bg-surface px-3 text-sm text-foreground" />
+      </label>
+      <label className="flex-1 text-[12px] text-muted-foreground">
+        Max ৳
+        <input inputMode="numeric" value={max} onChange={(e) => setMax(e.target.value.replace(/\D/g, ""))} placeholder={String(Math.ceil(range.max / 100))} className="mt-1 h-10 w-full rounded-lg border border-border bg-surface px-3 text-sm text-foreground" />
+      </label>
+      <Button type="submit" size="sm" variant="outline" className="h-10">Go</Button>
+    </form>
   );
 }
 

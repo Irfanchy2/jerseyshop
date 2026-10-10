@@ -10,9 +10,9 @@ export function RecentlyViewed({ excludeId }: { excludeId?: string }) {
   const ids = recentlyViewed.filter((id) => id !== excludeId).slice(0, 8);
   const key = ids.join(",");
   React.useEffect(() => {
-    if (!key) return setItems([]);
+    if (!key) return;
     fetch(`/api/products?ids=${key}`).then((r) => r.json()).then((d) => setItems(d.items ?? [])).catch(() => {});
   }, [key]);
-  if (items.length < 2) return null;
+  if (!key || items.length < 2) return null;
   return <ProductRail title={t.home.recentlyViewed} items={items} />;
 }

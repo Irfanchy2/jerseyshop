@@ -16,8 +16,6 @@ export function OrderStatusForm({ orderId, current, next }: { orderId: string; c
   const [status, setStatus] = React.useState<OrderStatus | "">(next[0] ?? "");
   const [note, setNote] = React.useState("");
   const [restock, setRestock] = React.useState(true);
-  const nextKey = next.join(",");
-  React.useEffect(() => setStatus((nextKey.split(",")[0] as OrderStatus) || ""), [nextKey]);
   if (!next.length) return <p className="text-sm text-muted-foreground">This order is {current.toLowerCase()} — no further status changes.</p>;
   return (
     <form
@@ -55,6 +53,12 @@ export function AdminNotesForm({ orderId, notes }: { orderId: string; notes: str
   );
 }
 
+async function loadPathao(kind: string, parent?: number): Promise<{ items: Loc[]; error: string | null }> {
+  const r = await fetch(`/api/admin/couriers/pathao/locations?kind=${kind}${parent ? `&parent=${parent}` : ""}`);
+  const d = await r.json().catch(() => ({}));
+  return r.ok ? { items: d.items as Loc[], error: null } : { items: [], error: d.error ?? "Could not load Pathao locations" };
+}
+
 type Prov = { code: string; name: string; enabled: boolean; mode: string; isDefault: boolean };
 type Loc = { id: number; name: string };
 
@@ -75,19 +79,13 @@ export function CreateShipmentDialog({ orderId, total, paid, providers, address 
   const p = providers.find((x) => x.code === provider);
   const needsPathaoLoc = provider === "pathao" && p?.mode !== "MOCK";
 
-  const load = React.useCallback(async (kind: string, parent?: number) => {
-    setLocError(null);
-    const r = await fetch(`/api/admin/couriers/pathao/locations?kind=${kind}${parent ? `&parent=${parent}` : ""}`);
-    const d = await r.json();
-    if (!r.ok) {
-      setLocError(d.error ?? "Could not load Pathao locations");
-      return [];
-    }
-    return d.items as Loc[];
+  const apply = React.useCallback((setter: (v: Loc[]) => void) => (r: { items: Loc[]; error: string | null }) => {
+    setLocError(r.error);
+    setter(r.items);
   }, []);
-  React.useEffect(() => { if (open && needsPathaoLoc && !cities.length) load("cities").then(setCities); }, [open, needsPathaoLoc, cities.length, load]);
-  React.useEffect(() => { if (needsPathaoLoc && loc.cityId) load("zones", loc.cityId).then(setZones); }, [needsPathaoLoc, loc.cityId, load]);
-  React.useEffect(() => { if (needsPathaoLoc && loc.zoneId) load("areas", loc.zoneId).then(setAreas); }, [needsPathaoLoc, loc.zoneId, load]);
+  React.useEffect(() => { if (open && needsPathaoLoc && !cities.length) loadPathao("cities").then(apply(setCities)); }, [open, needsPathaoLoc, cities.length, apply]);
+  React.useEffect(() => { if (needsPathaoLoc && loc.cityId) loadPathao("zones", loc.cityId).then(apply(setZones)); }, [needsPathaoLoc, loc.cityId, apply]);
+  React.useEffect(() => { if (needsPathaoLoc && loc.zoneId) loadPathao("areas", loc.zoneId).then(apply(setAreas)); }, [needsPathaoLoc, loc.zoneId, apply]);
 
   const submit = async () => {
     const r = await run({ orderId, provider: provider as "steadfast" | "pathao", codAmount: Number(cod), note: note || undefined, weightKg: Number(weight) || undefined, ...(needsPathaoLoc ? { pathaoCityId: loc.cityId || undefined, pathaoZoneId: loc.zoneId || undefined, pathaoAreaId: loc.areaId || undefined } : {}) });

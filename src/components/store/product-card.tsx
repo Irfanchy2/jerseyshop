@@ -59,7 +59,7 @@ export function ProductCard({ p, priority, index = 0 }: { p: Card; priority?: bo
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.7, delay: Math.min(index, 6) * 0.06, ease: [0.16, 1, 0.3, 1] }}
-      className="group relative"
+      className="pc group relative"
     >
       <div className="relative">
       <Link href={`/products/${p.slug}`} className="block" aria-label={p.name}>

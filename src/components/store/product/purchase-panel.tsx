@@ -66,10 +66,11 @@ export function PurchasePanel({ p, delivery }: { p: PdpProduct; delivery: { proc
     return () => io.disconnect();
   }, []);
 
-  React.useEffect(() => {
-    // Reset size when colour changes if that size isn't available in the new colour.
-    if (selected && selected.color !== color) setVariantId(p.variants.find((v) => v.color === color && v.size === selected.size)?.id ?? null);
-  }, [color, selected, p.variants]);
+  const pickColor = (name: string) => {
+    setColor(name);
+    // Keep the same size in the new colour when it exists.
+    if (selected) setVariantId(p.variants.find((v) => v.color === name && v.size === selected.size)?.id ?? null);
+  };
 
   const go = async (mode: "add" | "buy") => {
     if (!selected) {
@@ -112,7 +113,7 @@ export function PurchasePanel({ p, delivery }: { p: PdpProduct; delivery: { proc
           <p className="mb-3 text-sm font-medium">{t.product.color}: <span className="text-muted-foreground">{color}</span></p>
           <div className="flex gap-2.5">
             {colors.map(([name, hex]) => (
-              <button key={name} onClick={() => setColor(name)} aria-label={name} aria-pressed={color === name} className={cn("h-10 w-10 rounded-full border-2 p-0.5 transition", color === name ? "border-foreground" : "border-transparent hover:border-foreground/30")}>
+              <button key={name} onClick={() => pickColor(name)} aria-label={name} aria-pressed={color === name} className={cn("h-10 w-10 rounded-full border-2 p-0.5 transition", color === name ? "border-foreground" : "border-transparent hover:border-foreground/30")}>
                 <span className="block h-full w-full rounded-full border border-black/10" style={{ background: hex }} />
               </button>
             ))}

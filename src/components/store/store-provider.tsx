@@ -5,6 +5,7 @@ import type { Dictionary, Locale } from "@/lib/i18n/dictionaries";
 import type { PricedCart } from "@/lib/cart/server";
 import { formatMoney } from "@/lib/money";
 import { toast } from "@/components/ui/toast";
+import { createIdListStore } from "@/lib/client/id-list-store";
 
 type StoreCtx = {
   locale: Locale;
@@ -31,24 +32,8 @@ export function useStore() {
   return ctx;
 }
 
-const WISHLIST_KEY = "js:wishlist";
-const RECENT_KEY = "js:recent";
-
-function readLocal(key: string): string[] {
-  try {
-    const v = JSON.parse(localStorage.getItem(key) ?? "[]");
-    return Array.isArray(v) ? v.filter((x) => typeof x === "string").slice(0, 50) : [];
-  } catch {
-    return [];
-  }
-}
-function writeLocal(key: string, v: string[]) {
-  try {
-    localStorage.setItem(key, JSON.stringify(v));
-  } catch {
-    /* storage unavailable */
-  }
-}
+const wishlistStore = createIdListStore("js:wishlist");
+const recentStore = createIdListStore("js:recent", { max: 12 });
 
 export async function api<T>(url: string, init?: RequestInit): Promise<T> {
   const res = await fetch(url, { ...init, headers: { "Content-Type": "application/json", ...(init?.headers ?? {}) } });
@@ -70,8 +55,10 @@ export function StoreProvider({
 }) {
   const [cart, setCart] = React.useState<PricedCart | null>(null);
   const [cartOpen, setCartOpen] = React.useState(false);
-  const [wishlist, setWishlist] = React.useState<Set<string>>(new Set());
-  const [recentlyViewed, setRecent] = React.useState<string[]>([]);
+  const wishlistIds = React.useSyncExternalStore(wishlistStore.subscribe, wishlistStore.getSnapshot, wishlistStore.getServerSnapshot);
+  const recentIds = React.useSyncExternalStore(recentStore.subscribe, recentStore.getSnapshot, recentStore.getServerSnapshot);
+  const wishlist = React.useMemo(() => new Set(wishlistIds), [wishlistIds]);
+  const recentlyViewed = recentIds as string[];
 
   const money = React.useCallback((m: number) => formatMoney(m, locale), [locale]);
 
@@ -84,20 +71,24 @@ export function StoreProvider({
   }, []);
 
   React.useEffect(() => {
-    refreshCart();
-    setRecent(readLocal(RECENT_KEY));
-    const local = readLocal(WISHLIST_KEY);
-    setWishlist(new Set(local));
-    if (signedIn) {
-      // Merge any guest wishlist into the account, then use the server list.
-      api<{ ids: string[] }>("/api/wishlist", { method: local.length ? "POST" : "GET", body: local.length ? JSON.stringify({ productIds: local }) : undefined })
-        .then((r) => {
-          setWishlist(new Set(r.ids));
-          writeLocal(WISHLIST_KEY, []);
-        })
-        .catch(() => {});
+    api<PricedCart>("/api/cart").then(setCart).catch(() => {});
+  }, []);
+
+  React.useEffect(() => {
+    if (!signedIn) {
+      wishlistStore.setPersist(true);
+      return;
     }
-  }, [refreshCart, signedIn]);
+    // Signed in: merge any guest wishlist into the account, then mirror the server list in memory.
+    const local = [...wishlistStore.getSnapshot()];
+    wishlistStore.setPersist(false);
+    api<{ ids: string[] }>("/api/wishlist", { method: local.length ? "POST" : "GET", body: local.length ? JSON.stringify({ productIds: local }) : undefined })
+      .then((r) => {
+        wishlistStore.clearPersisted();
+        wishlistStore.set(r.ids);
+      })
+      .catch(() => {});
+  }, [signedIn]);
 
   const addToCart: StoreCtx["addToCart"] = React.useCallback(
     async (variantId, quantity = 1, opts) => {
@@ -125,30 +116,22 @@ export function StoreProvider({
 
   const toggleWishlist = React.useCallback(
     (productId: string, name?: string) => {
-      setWishlist((prev) => {
-        const next = new Set(prev);
-        const removing = next.has(productId);
-        if (removing) next.delete(productId);
-        else next.add(productId);
-        if (signedIn) {
-          api("/api/wishlist", { method: "POST", body: JSON.stringify({ productIds: [productId], remove: removing }) }).catch(() => {});
-        } else writeLocal(WISHLIST_KEY, [...next]);
-        if (!removing) {
-          toast({ title: dictionary.product.saved, description: name, action: { label: dictionary.nav.wishlist, href: "/account/wishlist" } });
-          api("/api/track", { method: "POST", body: JSON.stringify({ name: "wishlist_add", productId }) }).catch(() => {});
-        }
-        return next;
-      });
+      const current = wishlistStore.getSnapshot();
+      const removing = current.includes(productId);
+      wishlistStore.set(removing ? current.filter((x) => x !== productId) : [...current, productId]);
+      if (signedIn) api("/api/wishlist", { method: "POST", body: JSON.stringify({ productIds: [productId], remove: removing }) }).catch(() => {});
+      if (!removing) {
+        toast({ title: dictionary.product.saved, description: name, action: { label: dictionary.nav.wishlist, href: "/account/wishlist" } });
+        api("/api/track", { method: "POST", body: JSON.stringify({ name: "wishlist_add", productId }) }).catch(() => {});
+      }
     },
     [signedIn, dictionary],
   );
 
   const pushRecentlyViewed = React.useCallback((productId: string) => {
-    setRecent((prev) => {
-      const next = [productId, ...prev.filter((p) => p !== productId)].slice(0, 12);
-      writeLocal(RECENT_KEY, next);
-      return next;
-    });
+    const current = recentStore.getSnapshot();
+    if (current[0] === productId) return;
+    recentStore.set([productId, ...current.filter((p) => p !== productId)]);
   }, []);
 
   const value = React.useMemo<StoreCtx>(

@@ -3,6 +3,7 @@
 import * as React from "react";
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { formatMoney } from "@/lib/money";
+import { useReducedMotion } from "motion/react";
 
 /*
  * Single-series charts: one hue (reference categorical slot 1, stepped separately for light/dark),
@@ -97,8 +98,9 @@ export function BarsChart({ data, money, height = 240, layout = "horizontal" }: 
 export function AnimatedNumber({ value, format }: { value: number; format: "money" | "int" | "pct" }) {
   const [shown, setShown] = React.useState(value);
   const prev = React.useRef(0);
+  const reduce = useReducedMotion();
   React.useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return setShown(value);
+    if (reduce) return;
     const from = prev.current;
     const start = performance.now();
     let raf = 0;
@@ -111,8 +113,9 @@ export function AnimatedNumber({ value, format }: { value: number; format: "mone
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [value]);
-  if (format === "money") return <>{formatMoney(shown)}</>;
-  if (format === "pct") return <>{(shown / 10).toFixed(1)}%</>;
-  return <>{shown.toLocaleString("en-IN")}</>;
+  }, [value, reduce]);
+  const display = reduce ? value : shown;
+  if (format === "money") return <>{formatMoney(display)}</>;
+  if (format === "pct") return <>{(display / 10).toFixed(1)}%</>;
+  return <>{display.toLocaleString("en-IN")}</>;
 }

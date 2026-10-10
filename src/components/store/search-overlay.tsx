@@ -20,11 +20,7 @@ export function SearchOverlay({ open, onOpenChange }: { open: boolean; onOpenCha
   const [loading, setLoading] = React.useState(false);
 
   React.useEffect(() => {
-    if (q.trim().length < 2) {
-      setItems([]);
-      setTotal(0);
-      return;
-    }
+    if (q.trim().length < 2) return;
     const ctrl = new AbortController();
     const id = setTimeout(async () => {
       setLoading(true);
@@ -44,6 +40,9 @@ export function SearchOverlay({ open, onOpenChange }: { open: boolean; onOpenCha
     };
   }, [q]);
 
+  const short = q.trim().length < 2;
+  const shownItems = short ? [] : items;
+  const shownTotal = short ? 0 : total;
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!q.trim()) return;
@@ -87,11 +86,11 @@ export function SearchOverlay({ open, onOpenChange }: { open: boolean; onOpenCha
               </div>
             ) : (
               <div className="py-6">
-                {items.length === 0 && !loading ? (
+                {shownItems.length === 0 && !loading ? (
                   <p className="text-muted-foreground">{t.shop.noResults}</p>
                 ) : (
                   <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-                    {items.map((p) => (
+                    {shownItems.map((p) => (
                       <Link key={p.id} href={`/products/${p.slug}`} onClick={() => onOpenChange(false)} className="group">
                         <div className="img-zoom aspect-[4/5] overflow-hidden rounded-[var(--radius)] bg-muted">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -103,9 +102,9 @@ export function SearchOverlay({ open, onOpenChange }: { open: boolean; onOpenCha
                     ))}
                   </div>
                 )}
-                {total > items.length && (
+                {shownTotal > shownItems.length && (
                   <button onClick={submit} className="mt-6 inline-flex items-center gap-2 text-sm font-semibold underline underline-offset-4">
-                    See all {total} results <ArrowRight className="h-4 w-4" />
+                    See all {shownTotal} results <ArrowRight className="h-4 w-4" />
                   </button>
                 )}
               </div>

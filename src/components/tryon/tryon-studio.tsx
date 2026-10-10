@@ -61,7 +61,6 @@ export function TryOnStudio({ products, initialSlug, status, signedIn }: { produ
 
   React.useEffect(() => {
     if (!busy) return;
-    setStage(0);
     const id = setInterval(() => setStage((s) => Math.min(STAGES.length - 1, s + 1)), 3500);
     return () => clearInterval(id);
   }, [busy]);
@@ -91,6 +90,7 @@ export function TryOnStudio({ products, initialSlug, status, signedIn }: { produ
     if (!file && !sampleId) return setError("Upload a photo or choose a sample model first.");
     if (!consent) return setError("Please agree to the photo processing terms.");
     setError(null);
+    setStage(0);
     setSubmitting(true);
     setStep(3);
     try {
@@ -114,6 +114,7 @@ export function TryOnStudio({ products, initialSlug, status, signedIn }: { produ
   const regenerate = async () => {
     if (!job) return;
     setError(null);
+    setStage(0);
     setSubmitting(true);
     try {
       const res = await fetch(`/api/try-on/jobs/${job.id}/regenerate`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ productId }) });

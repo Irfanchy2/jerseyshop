@@ -8,7 +8,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
   // Draft preview is only available to signed-in staff.
   const draft = preview === "draft" && !!(await getStaff());
   const rows = await db.homepageSection.findMany({
-    where: draft ? { draftEnabled: true } : { isEnabled: true, publishedContent: { not: undefined } },
+    where: draft ? { draftEnabled: true } : { isEnabled: true },
     orderBy: draft ? { draftSortOrder: "asc" } : { sortOrder: "asc" },
   });
   const sections = rows
