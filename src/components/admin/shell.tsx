@@ -146,7 +146,7 @@ export function AdminShell({
   );
 
   return (
-    <div className={cn("admin-theme min-h-dvh bg-background text-foreground", dark && "dark")}>
+    <div className={cn("admin-theme min-h-dvh bg-background text-foreground", dark && "dark")} style={{ ["--admin-sidebar" as string]: collapsed ? "68px" : "248px" }}>
       {/* Desktop sidebar */}
       <aside className={cn("fixed inset-y-0 left-0 z-40 hidden flex-col border-r border-border bg-surface transition-[width] duration-300 lg:flex", collapsed ? "w-[68px]" : "w-[248px]")}>
         <div className={cn("flex h-16 items-center border-b border-border px-5", collapsed && "justify-center px-0")}>
