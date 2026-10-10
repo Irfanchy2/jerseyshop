@@ -16,7 +16,8 @@
     "db:seed:demo": "tsx prisma/seed.ts --demo",
     "db:purge-demo": "tsx prisma/purge-demo.ts",
     "db:reset": "prisma migrate reset --force --skip-seed && tsx prisma/seed.ts --demo",
-    "jobs:run": "tsx scripts/run-jobs.ts"
+    "jobs:run": "tsx --conditions=react-server scripts/run-jobs.ts",
+    "test:all": "vitest run && playwright test"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1149.0",
@@ -74,5 +75,8 @@
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
+  },
+  "engines": {
+    "node": ">=20.9"
   }
 }
