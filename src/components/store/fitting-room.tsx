@@ -86,6 +86,15 @@ export function FittingRoom() {
   const pathname = usePathname();
   const reduce = useReducedMotion();
   const [large, setLarge] = React.useState(false);
+  const panelRef = React.useRef<HTMLDivElement>(null);
+  const pillRef = React.useRef<HTMLButtonElement>(null);
+  const wasOpen = React.useRef(false);
+  const isOpen = !!ctx?.open;
+  React.useEffect(() => {
+    if (isOpen) panelRef.current?.querySelector<HTMLElement>("button, a")?.focus();
+    else if (wasOpen.current) pillRef.current?.focus();
+    wasOpen.current = isOpen;
+  }, [isOpen]);
   if (!ctx || HIDDEN_ON.some((p) => pathname.startsWith(p))) return null;
   const { open, setOpen, worn, clear } = ctx;
 
@@ -95,6 +104,8 @@ export function FittingRoom() {
         {open ? (
           <motion.div
             key="panel"
+            ref={panelRef}
+            onKeyDown={(e) => e.key === "Escape" && setOpen(false)}
             layoutId="fitting-room"
             className={cn("pointer-events-auto origin-bottom-left overflow-hidden rounded-[1.6rem] bg-surface shadow-[0_30px_80px_-30px_rgba(16,24,40,.45)] ring-1 ring-border", large ? "w-[min(440px,calc(100vw-1.5rem))]" : "w-[min(330px,calc(100vw-1.5rem))]")}
             transition={{ type: "spring", stiffness: 260, damping: 30 }}
@@ -174,6 +185,7 @@ export function FittingRoom() {
         ) : (
           <motion.button
             key="pill"
+            ref={pillRef}
             layoutId="fitting-room"
             onClick={() => setOpen(true)}
             className="pointer-events-auto flex h-14 items-center gap-3 rounded-full bg-surface pl-1.5 pr-5 shadow-[0_18px_40px_-18px_rgba(16,24,40,.45)] ring-1 ring-border md:h-[60px]"

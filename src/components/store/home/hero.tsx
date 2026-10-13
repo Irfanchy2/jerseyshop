@@ -37,11 +37,13 @@ function RackJersey({ item, i, n, reduce }: { item: Featured; i: number; n: numb
       onAnimationComplete={() => setEntered(true)}
       onHoverStart={() => setHover(true)}
       onHoverEnd={() => setHover(false)}
+      onFocus={() => setHover(true)}
+      onBlur={() => setHover(false)}
     >
       <motion.div
         style={{ transformOrigin: "50% 0%" }}
         animate={reduce ? undefined : { rotateZ: [0, 1.6, -1.1, 0.5, 0] }}
-        transition={{ duration: 6 + i * 0.8, repeat: Infinity, ease: "easeInOut", delay: 1.6 + i * 0.2 }}
+        transition={{ duration: 3.2 + i * 0.3, repeat: 1, ease: "easeInOut", delay: 1.6 + i * 0.2 }}
         className="relative text-foreground/80"
       >
         <Hanger />
@@ -71,7 +73,7 @@ function Lamp({ reduce }: { reduce: boolean | null }) {
       style={{ transformOrigin: "50% 0%" }}
       initial={reduce ? false : { y: -220 }}
       animate={reduce ? undefined : { y: 0, rotate: [0, 2.2, -1.6, 0.8, 0] }}
-      transition={{ y: { duration: 1.4, ease: EASE, delay: 0.2 }, rotate: { duration: 7, repeat: Infinity, ease: "easeInOut", delay: 1.6 } }}
+      transition={{ y: { duration: 1.4, ease: EASE, delay: 0.2 }, rotate: { duration: 3.5, repeat: 1, ease: "easeInOut", delay: 1.6 } }}
       aria-hidden
     >
       <svg viewBox="0 0 160 260" className="w-full text-foreground">
@@ -92,7 +94,7 @@ function Lamp({ reduce }: { reduce: boolean | null }) {
         <path d="M74 128 h12 l4 14 h-20 z" fill="#2a2a2d" />
         <path d="M80 140 C 40 142 18 160 10 196 H150 C 142 160 120 142 80 140 Z" fill="url(#lamp-shade)" />
         <ellipse cx="80" cy="196" rx="70" ry="6" fill="#0f0f10" />
-        <motion.circle cx="80" cy="214" r="46" fill="url(#lamp-glow)" animate={reduce ? undefined : { opacity: [0.75, 1, 0.8] }} transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }} />
+        <motion.circle cx="80" cy="214" r="46" fill="url(#lamp-glow)" animate={reduce ? undefined : { opacity: [0.75, 1, 0.8] }} transition={{ duration: 1.6, repeat: 2, repeatType: "reverse", ease: "easeInOut" }} />
         <ellipse cx="80" cy="206" rx="13" ry="16" fill="#ffe7b8" />
         <path d="M74 202 q6 8 12 0" stroke="#d98b2b" strokeWidth="1.6" fill="none" />
         <path d="M24 196 L58 236 M136 196 L102 236 M80 196 V244" stroke="#1c1c1e" strokeWidth="2" opacity=".55" />

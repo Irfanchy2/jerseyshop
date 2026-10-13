@@ -19,8 +19,14 @@ function SizePanel({ p, busy, onPick, onClose }: { p: Card; busy: string | null;
   const { t } = useStore();
   const color = p.colors[0]?.name;
   const variants = p.variants.filter((v) => v.color === color);
+  const ref = React.useRef<HTMLDivElement>(null);
+  React.useEffect(() => {
+    ref.current?.querySelector<HTMLButtonElement>("button[data-size]:not(:disabled)")?.focus();
+  }, []);
   return (
     <motion.div
+      ref={ref}
+      onKeyDown={(e) => e.key === "Escape" && (e.stopPropagation(), onClose())}
       initial={{ y: "105%" }}
       animate={{ y: 0 }}
       exit={{ y: "105%" }}
@@ -41,6 +47,7 @@ function SizePanel({ p, busy, onPick, onClose }: { p: Card; busy: string | null;
             key={v.id}
             disabled={v.stock <= 0 || !!busy}
             onClick={() => onPick(v.id)}
+            data-size={v.size}
             className={cn(
               "h-9 min-w-11 rounded-full bg-muted px-3 text-[13px] font-semibold transition hover:bg-accent hover:text-accent-foreground disabled:bg-muted disabled:text-muted-foreground/50 disabled:line-through",
               busy === v.id && "animate-pulse",
@@ -60,6 +67,11 @@ export function ProductCard({ p, priority, index = 0, compact }: { p: Card; prio
   const fitting = useFittingRoom();
   const [busy, setBusy] = React.useState<string | null>(null);
   const [sizesOpen, setSizesOpen] = React.useState(false);
+  const bagRef = React.useRef<HTMLButtonElement>(null);
+  const closeSizes = () => {
+    setSizesOpen(false);
+    bagRef.current?.focus();
+  };
   const saved = wishlist.has(p.id);
   const cutout = isCutout(p.image);
 
@@ -113,7 +125,7 @@ export function ProductCard({ p, priority, index = 0, compact }: { p: Card; prio
           {fitting && cutout && (
             <button
               onClick={() => fitting.wear({ id: p.id, slug: p.slug, name: p.name, image: p.image, price: p.price, tryOnEnabled: p.tryOnEnabled })}
-              className="hidden h-9 w-9 place-items-center rounded-full bg-muted transition hover:scale-105 active:scale-90 sm:grid md:h-10 md:w-10 md:-translate-y-1 md:opacity-0 md:group-hover:translate-y-0 md:group-hover:opacity-100 md:focus-visible:opacity-100"
+              className="hidden h-9 w-9 place-items-center rounded-full bg-muted transition hover:scale-105 active:scale-90 sm:grid md:h-10 md:w-10 [@media(hover:hover)]:md:-translate-y-1 [@media(hover:hover)]:md:opacity-0 md:group-hover:translate-y-0 md:group-hover:opacity-100 md:focus-visible:translate-y-0 md:focus-visible:opacity-100"
               aria-label={`Put ${p.name} on the fitting-room form`}
               title="Wear it in the fitting room"
             >
@@ -147,7 +159,9 @@ export function ProductCard({ p, priority, index = 0, compact }: { p: Card; prio
         {/* Bottom-right: quick add with the expanding corner */}
         {p.inStock && (
           <button
+            ref={bagRef}
             onClick={onBag}
+            aria-expanded={sizesOpen}
             className="group/bag absolute bottom-0 right-0 z-10 grid h-[68px] w-[68px] place-items-center md:h-[88px] md:w-[88px]"
             aria-label={`${t.product.quickAdd}: ${p.name}`}
           >
@@ -156,7 +170,7 @@ export function ProductCard({ p, priority, index = 0, compact }: { p: Card; prio
           </button>
         )}
 
-        <AnimatePresence>{sizesOpen && <SizePanel p={p} busy={busy} onPick={add} onClose={() => setSizesOpen(false)} />}</AnimatePresence>
+        <AnimatePresence>{sizesOpen && <SizePanel p={p} busy={busy} onPick={add} onClose={closeSizes} />}</AnimatePresence>
       </div>
     </motion.article>
   );

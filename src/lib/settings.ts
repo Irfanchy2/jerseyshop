@@ -104,7 +104,7 @@ export const APPEARANCE_PRESETS: Record<string, Settings["appearance"]["colors"]
     surface: "#ffffff",
     muted: "#eef0f3",
     foreground: "#141824",
-    mutedForeground: "#6b7180",
+    mutedForeground: "#646a78",
     border: "#e6e8ec",
     accent: "#e8742a",
     accentForeground: "#ffffff",

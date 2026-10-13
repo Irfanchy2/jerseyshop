@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { MotionConfig } from "framer-motion";
 
 export type WornItem = { id: string; slug: string; name: string; image: string | null; price: number; tryOnEnabled: boolean };
 
@@ -30,7 +31,12 @@ export function FittingRoomProvider({ children }: { children: React.ReactNode })
     }),
     [open, worn],
   );
-  return <FittingRoomContext.Provider value={value}>{children}</FittingRoomContext.Provider>;
+  // reducedMotion="user": every framer animation in the storefront honours the OS reduce-motion setting.
+  return (
+    <MotionConfig reducedMotion="user">
+      <FittingRoomContext.Provider value={value}>{children}</FittingRoomContext.Provider>
+    </MotionConfig>
+  );
 }
 
 /** Returns null outside the storefront (e.g. admin previews), so callers can hide the hanger button. */
