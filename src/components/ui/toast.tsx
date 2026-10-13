@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion } from "framer-motion";
 import { CheckCircle2, AlertCircle, Info } from "lucide-react";
 
 type Toast = { id: number; title: string; description?: string; tone?: "success" | "error" | "info"; action?: { label: string; href: string } };

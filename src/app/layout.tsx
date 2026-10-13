@@ -3,6 +3,7 @@ import "./globals.css";
 import { fontVariables } from "./fonts";
 import { getLocale } from "@/lib/i18n/server";
 import { getSettings } from "@/lib/settings";
+import { cookies } from "next/headers";
 
 export async function generateMetadata(): Promise<Metadata> {
   const s = await getSettings();
@@ -17,13 +18,18 @@ export async function generateMetadata(): Promise<Metadata> {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#f6f4ef",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f4f5f7" },
+    { media: "(prefers-color-scheme: dark)", color: "#0d0e11" },
+  ],
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const locale = await getLocale();
+  const [locale, jar] = await Promise.all([getLocale(), cookies()]);
+  // Storefront theme preference; the header toggle writes this cookie and flips the class client-side.
+  const dark = jar.get("theme")?.value === "dark";
   return (
-    <html lang={locale === "bn" ? "bn" : "en"} className={fontVariables} suppressHydrationWarning>
+    <html lang={locale === "bn" ? "bn" : "en"} className={`${fontVariables}${dark ? " dark" : ""}`} suppressHydrationWarning>
       <body className="min-h-dvh">{children}</body>
     </html>
   );

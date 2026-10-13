@@ -4,7 +4,7 @@ import { imgSrc, imgSrcSet } from "@/lib/images";
 import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion } from "framer-motion";
 import { Upload, ImagePlus, Trash2, RefreshCw, Download, Share2, ZoomIn, ZoomOut, ShieldCheck, Sparkles, Info, AlertTriangle, Check, Camera, Sun, User, Shirt, ChevronLeft } from "lucide-react";
 import { useStore } from "@/components/store/store-provider";
 import { Button } from "@/components/ui/button";

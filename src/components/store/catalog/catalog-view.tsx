@@ -4,6 +4,7 @@ import { catalogFacets, searchCatalog, type CatalogFilters } from "@/lib/catalog
 import { getDictionary, getLocale } from "@/lib/i18n/server";
 import { fmt } from "@/lib/i18n/format";
 import { ProductGrid } from "../product-card";
+import { SplitTitle } from "../section-heading";
 import { ActiveFilters, FilterPanel, FilterPending, MobileFilters, SortSelect } from "./filters";
 import { cn } from "@/lib/utils";
 
@@ -36,7 +37,7 @@ export async function CatalogView({
     <div className="container-x pb-10 pt-8 md:pt-12">
       <header className="mb-8 md:mb-10">
         {eyebrow && <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">{eyebrow}</p>}
-        <h1 className="font-heading text-[34px] font-extrabold leading-none md:text-[52px]">{title}</h1>
+        <h1 className="font-heading text-[36px] leading-none tracking-[-0.035em] md:text-[54px]"><SplitTitle text={title} /></h1>
         {description && <p className="mt-3 max-w-2xl text-muted-foreground">{description}</p>}
       </header>
       <Suspense>
@@ -57,7 +58,7 @@ export async function CatalogView({
             <ActiveFilters facets={facets} />
             <FilterPending>
               {result.items.length ? (
-                <ProductGrid items={result.items} priorityCount={4} className="lg:grid-cols-3 xl:grid-cols-4" />
+                <ProductGrid items={result.items} priorityCount={4} />
               ) : (
                 <div className="rounded-[var(--radius)] border border-dashed border-border px-6 py-20 text-center">
                   <p className="font-heading text-xl font-semibold">{t.shop.noResults}</p>

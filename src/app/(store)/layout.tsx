@@ -13,6 +13,8 @@ import { ThemeStyle } from "@/components/store/theme-style";
 import { Toaster } from "@/components/ui/toast";
 import { PageTracker } from "@/components/store/page-tracker";
 import { ConsentAndPixels } from "@/components/store/consent-and-pixels";
+import { FittingRoomProvider } from "@/components/store/fitting-room-context";
+import { FittingRoom } from "@/components/store/fitting-room";
 
 export default async function StoreLayout({ children }: { children: React.ReactNode }) {
   const [settings, locale, t, user, categories, teams, collections, demoOrders] = await Promise.all([
@@ -36,6 +38,7 @@ export default async function StoreLayout({ children }: { children: React.ReactN
   };
   return (
     <StoreProvider locale={locale} dictionary={t} signedIn={!!user}>
+      <FittingRoomProvider>
       <ThemeStyle appearance={appearance} />
       {previewing && (
         <a href="/api/admin/preview?on=0" className="fixed bottom-4 left-4 z-[65] rounded-full bg-warning px-4 py-2 text-[12px] font-semibold text-white shadow-lg">Draft preview — exit</a>
@@ -51,7 +54,9 @@ export default async function StoreLayout({ children }: { children: React.ReactN
       <Suspense fallback={null}>
         <PageTracker />
       </Suspense>
+      <FittingRoom />
       <ConsentAndPixels ids={settings.marketing} />
+      </FittingRoomProvider>
     </StoreProvider>
   );
 }

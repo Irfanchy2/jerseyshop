@@ -19,11 +19,11 @@ export function Reviews({ title, reviews, verifiedLabel }: { title: string; revi
   return (
     <section className="section-y">
       <div className="container-x">
-        <SectionHeading title={title} />
+        <SectionHeading eyebrow={verifiedLabel} title={title} />
         <div className="no-scrollbar -mx-4 flex snap-x gap-4 overflow-x-auto px-4 md:mx-0 md:grid md:grid-cols-3 md:px-0">
           {reviews.map((r) => (
-            <figure key={r.id} className="flex min-w-[85%] snap-start flex-col rounded-[var(--radius)] border border-border bg-surface p-6 sm:min-w-[60%] md:min-w-0">
-              <Stars value={r.rating} />
+            <figure key={r.id} className="flex min-w-[85%] snap-start flex-col rounded-[1.5rem] bg-surface p-7 sm:min-w-[60%] md:min-w-0">
+              <span className="text-accent"><Stars value={r.rating} /></span>
               {r.title && <p className="mt-4 font-heading text-lg font-semibold">{r.title}</p>}
               <blockquote className="mt-2 flex-1 text-[15px] leading-relaxed text-muted-foreground">“{r.body}”</blockquote>
               <figcaption className="mt-6 flex items-center gap-3 border-t border-border pt-4">

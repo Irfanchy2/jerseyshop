@@ -14,5 +14,5 @@ export function RecentlyViewed({ excludeId }: { excludeId?: string }) {
     fetch(`/api/products?ids=${key}`).then((r) => r.json()).then((d) => setItems(d.items ?? [])).catch(() => {});
   }, [key]);
   if (!key || items.length < 2) return null;
-  return <ProductRail title={t.home.recentlyViewed} items={items} />;
+  return <ProductRail title={t.home.recentlyViewed} items={items} layout="carousel" />;
 }

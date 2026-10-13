@@ -3,7 +3,7 @@
 import { imgSrc, imgSrcSet } from "@/lib/images";
 import * as React from "react";
 import dynamic from "next/dynamic";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion } from "framer-motion";
 import { Box, ZoomIn, X } from "lucide-react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { cn } from "@/lib/utils";
@@ -38,10 +38,10 @@ export function Gallery({ images, name, design, has3d }: { images: Img[]; name: 
             role="tab"
             aria-selected={mode === "image" && i === active}
             onClick={() => { setMode("image"); setActive(i); }}
-            className={cn("relative aspect-[4/5] w-[72px] shrink-0 overflow-hidden rounded-[calc(var(--radius)*0.6)] bg-muted ring-offset-2 ring-offset-background transition lg:w-full", mode === "image" && i === active ? "ring-2 ring-foreground" : "opacity-70 hover:opacity-100")}
+            className={cn("relative aspect-[4/5] w-[72px] shrink-0 overflow-hidden rounded-[calc(var(--radius)*0.6)] bg-surface ring-offset-2 ring-offset-background transition lg:w-full", mode === "image" && i === active ? "ring-2 ring-foreground" : "opacity-70 hover:opacity-100")}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={imgSrc(im.url, 320)} alt="" className="h-full w-full object-cover" />
+            <img src={imgSrc(im.url, 320, { transparent: im.url.startsWith("/art/jersey/") })} alt="" className={cn("h-full w-full", im.url.startsWith("/art/jersey/") ? "object-contain p-1.5" : "object-cover")} />
             <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/40 to-transparent py-1 text-center text-[10px] font-semibold capitalize text-white">{im.kind.toLowerCase()}</span>
           </button>
         ))}
@@ -58,7 +58,7 @@ export function Gallery({ images, name, design, has3d }: { images: Img[]; name: 
       </div>
 
       {/* Main stage */}
-      <div className="relative order-1 overflow-hidden rounded-[var(--radius)] bg-muted lg:order-2" style={{ aspectRatio: "4/5" }}>
+      <div className="relative order-1 overflow-hidden rounded-[var(--radius)] bg-surface lg:order-2" style={{ aspectRatio: "4/5" }}>
         {mode === "3d" && design ? (
           <div className="absolute inset-0">
             <Jersey3D design={design} />
@@ -74,8 +74,8 @@ export function Gallery({ images, name, design, has3d }: { images: Img[]; name: 
             <AnimatePresence mode="popLayout" initial={false}>
               <motion.img
                 key={img?.url}
-                src={imgSrc(img?.url, 1280)}
-                srcSet={imgSrcSet(img?.url)}
+                src={imgSrc(img?.url, 1280, { transparent: !!img?.url.startsWith("/art/jersey/") })}
+                srcSet={imgSrcSet(img?.url, { transparent: !!img?.url.startsWith("/art/jersey/") })}
                 sizes="(min-width: 1024px) 55vw, 100vw"
                 alt={img?.alt ?? name}
                 initial={{ opacity: 0, scale: 1.02 }}
@@ -83,7 +83,7 @@ export function Gallery({ images, name, design, has3d }: { images: Img[]; name: 
                 exit={{ opacity: 0 }}
                 transition={{ opacity: { duration: 0.35 }, scale: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } }}
                 style={{ transformOrigin: zoom ? `${zoom.x}% ${zoom.y}%` : "50% 50%" }}
-                className="absolute inset-0 h-full w-full object-cover"
+                className={cn("absolute inset-0 h-full w-full", img?.url.startsWith("/art/jersey/") ? "object-contain p-[6%]" : "object-cover")}
                 fetchPriority="high"
               />
             </AnimatePresence>

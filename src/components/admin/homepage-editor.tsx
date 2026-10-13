@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
 
 type Section = { id: string; type: SectionType; enabled: boolean; content: Record<string, unknown>; published: boolean };
 
-const ENUMS: Record<string, string[]> = { tone: ["dark", "light"], source: ["best", "new", "featured", "collection", "manual"] };
+const ENUMS: Record<string, string[]> = { tone: ["dark", "light"], source: ["best", "new", "featured", "collection", "manual"], align: ["left", "center"] };
 const humanize = (k: string) => k.replace(/Bn$/, " (Bangla)").replace(/([A-Z])/g, " $1").replace(/^./, (c) => c.toUpperCase()).replace("Href", "link").replace("Url", " URL").replace("Cta", "Button");
 
 function ImageField({ value, onChange, label }: { value: string | null; onChange: (v: string | null) => void; label: string }) {
@@ -144,7 +144,7 @@ export function HomepageEditor({ initial, products, collections, dirtyFromPublis
       </ul>
       <div className="flex flex-wrap items-center gap-2">
         <span className="text-[13px] text-muted-foreground">Add section:</span>
-        {(["editorial_banner", "product_rail", "category_cards", "featured_collections", "tryon_promo", "personalise_promo", "reviews", "trust", "newsletter", "recently_viewed", "club_national", "hero"] as SectionType[]).map((t) => (
+        {(["edits", "editorial_banner", "product_rail", "category_cards", "featured_collections", "tryon_promo", "personalise_promo", "reviews", "trust", "newsletter", "recently_viewed", "club_national", "hero"] as SectionType[]).map((t) => (
           <Button key={t} size="sm" variant="ghost" loading={add.pending} onClick={() => add.run(t)}><Plus className="h-3.5 w-3.5" /> {SECTION_LABELS[t]}</Button>
         ))}
       </div>

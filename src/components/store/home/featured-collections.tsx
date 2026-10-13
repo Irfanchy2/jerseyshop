@@ -1,45 +1,89 @@
 "use client";
-import { imgSrc, imgSrcSet } from "@/lib/images";
+
+import { imgSrc } from "@/lib/images";
 import Link from "next/link";
-import { Reveal } from "../reveal";
+import { motion } from "framer-motion";
+import { ArrowRight } from "lucide-react";
+import type { ProductCard as Card } from "@/lib/catalog/queries";
 import { useStore } from "../store-provider";
 import { SectionHeading } from "../section-heading";
+import { ProductCard } from "../product-card";
+import { EASE, Stagger, staggerItem } from "../motion";
 
 type Col = { slug: string; name: string; nameBn: string | null; description: string | null; accentHex: string | null; imageUrl: string | null; images: string[]; count: number };
 
-export function FeaturedCollections({ title, collections }: { title: string; collections: Col[] }) {
+const FAN = [
+  { rotate: -9, rest: "-46%", z: 1 },
+  { rotate: 7, rest: "44%", z: 2 },
+  { rotate: 0, rest: "0%", z: 3 },
+];
+
+export function FeaturedCollections({ eyebrow, title, collections, products }: { eyebrow?: string; title: string; collections: Col[]; products: Card[] }) {
   const { locale } = useStore();
-  if (!collections.length) return null;
+  const L = (en: string, bn: string | null) => (locale === "bn" && bn ? bn : en);
+  const [main, ...rest] = collections;
+  if (!main) return null;
+  const name = L(main.name, main.nameBn).trim().split(/\s+/);
   return (
     <section className="section-y">
       <div className="container-x">
-        <SectionHeading title={title} href="/collections" linkLabel={locale === "bn" ? "সব কালেকশন" : "All collections"} />
-        <div className="grid gap-4 md:grid-cols-3 md:gap-5">
-          {collections.map((col, i) => (
-            <Reveal key={col.slug} index={i}>
-              <Link href={`/collections/${col.slug}`} className="group relative flex aspect-[4/5] flex-col justify-end overflow-hidden rounded-[var(--radius)] p-6 text-white md:p-8" style={{ background: col.accentHex ?? "#1f2937" }}>
-                {col.imageUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={col.imageUrl} alt="" className="absolute inset-0 h-full w-full object-cover opacity-80 transition duration-[1.2s] group-hover:scale-105" />
-                ) : (
-                  <div className="absolute inset-x-0 top-0 flex h-[66%] items-center justify-center px-6">
-                    {col.images.slice(0, 3).map((src, k) => (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img key={k} src={imgSrc(src, 480, { transparent: true })} srcSet={imgSrcSet(src, { transparent: true })} sizes="15vw" alt="" loading="lazy" className="-mx-[5%] w-[42%] transition-transform duration-[1.2s] ease-[var(--ease-out-expo)] group-hover:-translate-y-2" style={{ transform: `rotate(${(k - 1) * 7}deg) translateY(${k === 1 ? 0 : 18}px)`, zIndex: k === 1 ? 2 : 1 }} />
-                    ))}
-                  </div>
-                )}
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
-                <div className="relative">
-                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/70">{col.count} jerseys</p>
-                  <h3 className="mt-1 font-heading text-2xl font-bold md:text-3xl">{locale === "bn" && col.nameBn ? col.nameBn : col.name}</h3>
-                  {col.description && <p className="mt-2 max-w-sm text-sm text-white/75">{col.description}</p>}
-                  <span className="mt-4 inline-block border-b border-white/60 pb-0.5 text-sm font-semibold transition group-hover:border-white">Shop collection</span>
+        <SectionHeading eyebrow={eyebrow} title={title} align="center" />
+        <Stagger className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-5 lg:grid-cols-[1.9fr_1fr_1fr]" gap={0.1}>
+          <motion.div variants={staggerItem} className="col-span-2 lg:col-span-1">
+            <Link href={`/collections/${main.slug}`} className="group relative block h-[380px] overflow-hidden rounded-[1.75rem] bg-surface md:h-full md:min-h-[440px]">
+              {main.imageUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={main.imageUrl} alt="" className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1200ms] ease-[var(--ease-out-expo)] group-hover:scale-[1.04]" loading="lazy" />
+              ) : (
+                <div className="absolute bottom-[-6%] right-[4%] h-[86%] w-[58%] md:right-[8%]">
+                  {main.images.slice(0, 3).map((src, i) => (
+                    <motion.div
+                      key={src}
+                      className="absolute bottom-0 left-[19%] w-[62%]"
+                      style={{ zIndex: FAN[i].z }}
+                      initial={{ rotate: 0, x: "0%" }}
+                      whileInView={{ rotate: FAN[i].rotate, x: FAN[i].rest }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 1.2, delay: 0.2, ease: EASE }}
+                    >
+                      <div className={`transition-transform duration-700 ease-[var(--ease-out-expo)] ${i === 0 ? "group-hover:-translate-x-[18%] group-hover:-rotate-6" : i === 1 ? "group-hover:translate-x-[18%] group-hover:rotate-6" : "group-hover:-translate-y-[6%]"}`}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={imgSrc(src, 480, { transparent: true })} alt="" loading="lazy" decoding="async" className="w-full drop-shadow-[0_24px_28px_rgba(0,0,0,.18)]" />
+                      </div>
+                    </motion.div>
+                  ))}
                 </div>
-              </Link>
-            </Reveal>
+              )}
+              <div className="absolute inset-0 bg-gradient-to-r from-surface via-surface/70 to-transparent md:via-surface/30" aria-hidden />
+              <div className="relative flex h-full flex-col justify-between p-7 md:p-10">
+                <div>
+                  <p className="text-[11.5px] font-medium uppercase tracking-[0.36em] text-accent-ink">{main.count} {locale === "bn" ? "পণ্য" : "pieces"}</p>
+                  <h3 className="mt-4 font-heading text-[38px] leading-[1.02] tracking-[-0.04em] md:text-[52px]">
+                    <span className="block font-light">{name.length > 1 ? name.slice(0, -1).join(" ") : ""}</span>
+                    <span className="block font-bold">{name[name.length - 1]}</span>
+                  </h3>
+                  {main.description && <p className="mt-4 max-w-[17rem] text-[14.5px] leading-relaxed text-muted-foreground">{main.description}</p>}
+                </div>
+                <span className="inline-flex items-center gap-2 text-[15px] font-medium">
+                  {locale === "bn" ? "কালেকশন দেখুন" : "Shop the edit"}
+                  <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                </span>
+              </div>
+            </Link>
+          </motion.div>
+          {products.slice(0, 2).map((p, i) => (
+            <ProductCard key={p.id} p={p} index={i} compact />
           ))}
-        </div>
+        </Stagger>
+        {rest.length > 0 && (
+          <div className="mt-6 flex flex-wrap justify-center gap-2">
+            {rest.map((c) => (
+              <Link key={c.slug} href={`/collections/${c.slug}`} className="rounded-full bg-surface px-4 py-2 text-[14px] transition-colors hover:bg-accent hover:text-accent-foreground">
+                {L(c.name, c.nameBn)}
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

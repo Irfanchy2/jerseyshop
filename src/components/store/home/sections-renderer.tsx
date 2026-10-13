@@ -16,6 +16,7 @@ import { Reviews } from "./reviews";
 import { RecentlyViewed } from "./recently-viewed";
 import { NewsletterBlock } from "./newsletter-block";
 import { EditorialBanner } from "./editorial-banner";
+import { Edits } from "./edits";
 
 export type RenderableSection = { id: string; type: string; content: unknown };
 
@@ -23,6 +24,14 @@ async function imagesBySlug(slugs: string[]) {
   if (!slugs.length) return {} as Record<string, string | null>;
   const rows = await db.product.findMany({ where: { slug: { in: slugs } }, select: { slug: true, images: { orderBy: { sortOrder: "asc" }, take: 1 } } });
   return Object.fromEntries(rows.map((r) => [r.slug, r.images[0]?.url ?? null]));
+}
+
+async function maxLiveDiscount() {
+  const rows = await db.product.findMany({
+    where: { ...publishedWhere(), OR: [{ salePriceMinor: { not: null } }, { compareAtMinor: { not: null } }] },
+    select: { priceMinor: true, compareAtMinor: true, salePriceMinor: true, saleStartsAt: true, saleEndsAt: true },
+  });
+  return rows.reduce((m, p) => Math.max(m, effectivePrice(p).percentOff), 0);
 }
 
 async function Section({ s, t, locale }: { s: RenderableSection; t: Dictionary; locale: Locale }) {
@@ -36,11 +45,25 @@ async function Section({ s, t, locale }: { s: RenderableSection; t: Dictionary; 
         where: { slug: { in: hc.featuredProductSlugs }, ...publishedWhere() },
         include: { images: { orderBy: { sortOrder: "asc" }, take: 1 }, team: true },
       });
-      const featured = hc.featuredProductSlugs
-        .map((slug) => products.find((p) => p.slug === slug))
-        .filter(Boolean)
+      const picked = hc.featuredProductSlugs.map((slug) => products.find((p) => p.slug === slug)).filter(Boolean) as typeof products;
+      // Keep the rack full even if some picks were unpublished.
+      if (picked.length < 7) {
+        picked.push(
+          ...(await db.product.findMany({
+            where: { ...publishedWhere(), slug: { notIn: picked.map((p) => p.slug) }, images: { some: { url: { startsWith: "/art/jersey/" } } } },
+            include: { images: { orderBy: { sortOrder: "asc" }, take: 1 }, team: true },
+            orderBy: [{ isFeatured: "desc" }, { createdAt: "desc" }],
+            take: 7 - picked.length,
+          })),
+        );
+      }
+      const featured = picked
         .map((p) => ({ slug: p!.slug, name: L(p!.name, p!.nameBn ?? undefined), image: p!.images[0]?.url ?? null, price: effectivePrice(p!).price, teamName: p!.team?.name ?? null }));
       return <Hero c={hc} featured={featured} />;
+    }
+    case "edits": {
+      const ec = c as SectionContent<"edits">;
+      return <Edits c={ec} images={await imagesBySlug(ec.items.map((i) => i.productSlug).filter(Boolean) as string[])} />;
     }
     case "category_cards": {
       const cc = c as SectionContent<"category_cards">;
@@ -58,7 +81,18 @@ async function Section({ s, t, locale }: { s: RenderableSection; t: Dictionary; 
         const list = await getProductList({ where: { slug: { in: pc.productSlugs } }, take: pc.limit }, locale);
         items = pc.productSlugs.map((slug) => list.find((x) => x.slug === slug)).filter(Boolean) as typeof list;
       }
-      return <ProductRail title={L(pc.title, pc.titleBn)} href={pc.href || undefined} items={items} />;
+      return (
+        <ProductRail
+          eyebrow={L(pc.eyebrow, pc.eyebrowBn) || undefined}
+          title={L(pc.title, pc.titleBn)}
+          sub={L(pc.sub, pc.subBn) || undefined}
+          href={pc.href || undefined}
+          align={pc.align}
+          columns={pc.columns as 3 | 4}
+          ctaLabel={L(pc.ctaLabel, pc.ctaLabelBn) || undefined}
+          items={items}
+        />
+      );
     }
     case "featured_collections": {
       const fc = c as SectionContent<"featured_collections">;
@@ -66,14 +100,15 @@ async function Section({ s, t, locale }: { s: RenderableSection; t: Dictionary; 
         where: { slug: { in: fc.collectionSlugs }, isActive: true },
         include: {
           _count: { select: { products: { where: { product: publishedWhere() } } } },
-          products: { where: { product: publishedWhere() }, take: 3, orderBy: { sortOrder: "asc" }, include: { product: { include: { images: { orderBy: { sortOrder: "asc" }, take: 1 } } } } },
+          products: { where: { product: publishedWhere() }, take: 5, orderBy: { sortOrder: "asc" }, include: { product: { include: { images: { orderBy: { sortOrder: "asc" }, take: 1 } } } } },
         },
       });
       const ordered = fc.collectionSlugs.map((slug) => cols.find((x) => x.slug === slug)).filter(Boolean).map((col) => ({
         slug: col!.slug, name: col!.name, nameBn: col!.nameBn, description: col!.description, accentHex: col!.accentHex, imageUrl: col!.imageUrl,
         images: col!.products.map((p) => p.product.images[0]?.url).filter(Boolean) as string[], count: col!._count.products,
       }));
-      return <FeaturedCollections title={L(fc.title, fc.titleBn)} collections={ordered} />;
+      const products = ordered[0] ? await getProductList({ where: { collections: { some: { collection: { slug: ordered[0].slug } } } }, take: 2 }, locale) : [];
+      return <FeaturedCollections eyebrow={L(fc.eyebrow, fc.eyebrowBn) || undefined} title={L(fc.title, fc.titleBn)} collections={ordered} products={products} />;
     }
     case "personalise_promo": {
       const pp = c as SectionContent<"personalise_promo">;
@@ -96,10 +131,14 @@ async function Section({ s, t, locale }: { s: RenderableSection; t: Dictionary; 
     case "editorial_banner": {
       const ec = c as SectionContent<"editorial_banner">;
       const img = ec.productSlug ? (await imagesBySlug([ec.productSlug]))[ec.productSlug] : null;
-      return <EditorialBanner c={ec} productImage={img ?? null} />;
+      const usesDiscount = /\{maxOff\}/.test(ec.headline + ec.headlineBn + ec.body + ec.bodyBn);
+      const maxOff = usesDiscount ? await maxLiveDiscount() : 0;
+      // Never advertise a discount that doesn't exist.
+      if (usesDiscount && maxOff <= 0) return null;
+      return <EditorialBanner c={ec} productImage={img ?? null} maxOff={maxOff} />;
     }
     case "trust":
-      return <Trust t={t} />;
+      return <Trust />;
     case "reviews": {
       const rc = c as SectionContent<"reviews">;
       const reviews = await db.review.findMany({

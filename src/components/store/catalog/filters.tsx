@@ -136,6 +136,7 @@ export function FilterPanel({ facets, hideCategory }: { facets: Facets; hideCate
       </Group>
       <Group title={t.shop.availability}>
         <CheckRow label={t.shop.inStockOnly} checked={sp.get("stock") === "1"} onChange={() => set((p) => (p.get("stock") === "1" ? p.delete("stock") : p.set("stock", "1")))} />
+        <CheckRow label={t.nav.sale} checked={sp.get("sale") === "1"} onChange={() => set((p) => (p.get("sale") === "1" ? p.delete("sale") : p.set("sale", "1")))} />
       </Group>
     </div>
   );
@@ -173,6 +174,7 @@ export function ActiveFilters({ facets }: { facets: Facets }) {
   }
   if (sp.get("min") || sp.get("max")) chips.push({ label: `৳${sp.get("min") ?? 0}–${sp.get("max") ?? "∞"}`, remove: () => set((p) => { p.delete("min"); p.delete("max"); }) });
   if (sp.get("stock") === "1") chips.push({ label: t.shop.inStockOnly, remove: () => set((p) => p.delete("stock")) });
+  if (sp.get("sale") === "1") chips.push({ label: t.nav.sale, remove: () => set((p) => p.delete("sale")) });
   if (sp.get("q")) chips.push({ label: `“${sp.get("q")}”`, remove: () => set((p) => p.delete("q")) });
   if (!chips.length) return null;
   return (

@@ -12,6 +12,7 @@ export const productCardInclude = {
   variants: { where: { isActive: true }, orderBy: { sortOrder: "asc" } },
   team: true,
   category: true,
+  reviews: { where: { status: "APPROVED" }, select: { rating: true } },
 } satisfies Prisma.ProductInclude;
 
 export type ProductCardData = Prisma.ProductGetPayload<{ include: typeof productCardInclude }>;
@@ -21,6 +22,8 @@ export function toCard(p: ProductCardData, locale = "en") {
   const price = effectivePrice(p);
   const sizes = [...new Set(p.variants.map((v) => v.size))].sort((a, b) => SIZE_ORDER.indexOf(a) - SIZE_ORDER.indexOf(b));
   const colors = [...new Map(p.variants.map((v) => [v.color, v.colorHex])).entries()].map(([name, hex]) => ({ name, hex }));
+  const ratingCount = p.reviews.length;
+  const rating = ratingCount ? Math.round((p.reviews.reduce((a, r) => a + r.rating, 0) / ratingCount) * 10) / 10 : null;
   const isNew = p.publishedAt ? Date.now() - new Date(p.publishedAt).getTime() < 1000 * 3600 * 24 * 30 : false;
   return {
     id: p.id,
@@ -41,6 +44,8 @@ export function toCard(p: ProductCardData, locale = "en") {
     isNew,
     customizable: p.customizable,
     tryOnEnabled: p.tryOnEnabled,
+    rating,
+    ratingCount,
   };
 }
 export type ProductCard = ReturnType<typeof toCard>;
@@ -57,6 +62,7 @@ export type CatalogFilters = {
   minPrice?: number; // minor units
   maxPrice?: number;
   inStock?: boolean;
+  onSale?: boolean;
   sort?: "featured" | "newest" | "price-asc" | "price-desc" | "best";
   page?: number;
   perPage?: number;
@@ -84,6 +90,7 @@ export function parseFilters(sp: Record<string, string | string[] | undefined>):
     minPrice: num("min"),
     maxPrice: num("max"),
     inStock: sp.stock === "1",
+    onSale: sp.sale === "1",
     sort: (["featured", "newest", "price-asc", "price-desc", "best"].includes(sort) ? sort : "featured") as CatalogFilters["sort"],
     page: Math.max(1, Number(sp.page) || 1),
   };
@@ -141,7 +148,8 @@ export async function searchCatalog(f: CatalogFilters, locale = "en") {
       isFeatured: true, isBestSeller: true, createdAt: true, publishedAt: true,
     },
   });
-  let rows = slim.map((p) => ({ ...p, eff: effectivePrice(p).price }));
+  let rows = slim.map((p) => { const e = effectivePrice(p); return { ...p, eff: e.price, discounted: e.original != null }; });
+  if (f.onSale) rows = rows.filter((r) => r.discounted);
   if (f.minPrice != null) rows = rows.filter((r) => r.eff >= f.minPrice!);
   if (f.maxPrice != null) rows = rows.filter((r) => r.eff <= f.maxPrice!);
 

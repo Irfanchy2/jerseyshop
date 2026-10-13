@@ -1,6 +1,7 @@
 /** UI strings. Product/CMS content carries its own `*Bn` fields. */
 export const en = {
   nav: {
+    home: "Home", newArrivals: "New arrivals", sale: "Sale", theme: "Toggle dark mode", languageEn: "English", languageBn: "বাংলা",
     shop: "Shop", collections: "Collections", clubs: "Clubs", national: "National Teams", custom: "Personalise",
     tryOn: "Virtual Try-On", training: "Training", newIn: "New In", search: "Search", account: "Account",
     wishlist: "Wishlist", cart: "Bag", menu: "Menu", close: "Close", trackOrder: "Track order", signIn: "Sign in",
@@ -68,11 +69,17 @@ export const en = {
     returns: "Return policy", privacy: "Privacy policy", terms: "Terms", about: "About", rights: "All rights reserved.",
     payments: "Cash on Delivery · Cards · bKash · Nagad",
   },
+  fitting: {
+    title: "Fitting room", hint: "Tap the hanger on any jersey to wear it.", tryAi: "Try on with AI", startOver: "Start over",
+    browse: "Browse jerseys", aiLink: "AI try-on", open: "Open the fitting room", pill: "Try it on",
+    disclaimer: "Quick preview on a dress form, not AI-generated. Use AI try-on to see it on you.",
+  },
   trust: {
     cod: "Cash on delivery", codBody: "Pay when it arrives, anywhere in Bangladesh.",
     delivery: "Fast delivery", deliveryBody: "1–2 days in Dhaka, 2–4 days nationwide.",
     returns: "Easy returns", returnsBody: "7-day size exchanges on non-personalised kits.",
     quality: "Premium fabric", qualityBody: "Breathable, quick-dry performance knit.",
+    codShort: "Pay when it arrives", deliveryShort: "1–2 days inside Dhaka", returnsShort: "7-day size exchange", qualityShort: "Quick-dry performance knit",
   },
 };
 
@@ -80,6 +87,7 @@ export type Dictionary = typeof en;
 
 export const bn: Dictionary = {
   nav: {
+    home: "হোম", newArrivals: "নতুন এসেছে", sale: "সেল", theme: "ডার্ক মোড পরিবর্তন", languageEn: "English", languageBn: "বাংলা",
     shop: "শপ", collections: "কালেকশন", clubs: "ক্লাব", national: "জাতীয় দল", custom: "পার্সোনালাইজ",
     tryOn: "ভার্চুয়াল ট্রাই-অন", training: "ট্রেনিং", newIn: "নতুন", search: "খুঁজুন", account: "অ্যাকাউন্ট",
     wishlist: "উইশলিস্ট", cart: "ব্যাগ", menu: "মেনু", close: "বন্ধ", trackOrder: "অর্ডার ট্র্যাক", signIn: "সাইন ইন",
@@ -150,7 +158,13 @@ export const bn: Dictionary = {
     returns: "রিটার্ন নীতি", privacy: "গোপনীয়তা নীতি", terms: "শর্তাবলি", about: "আমাদের সম্পর্কে", rights: "সর্বস্বত্ব সংরক্ষিত।",
     payments: "ক্যাশ অন ডেলিভারি · কার্ড · বিকাশ · নগদ",
   },
+  fitting: {
+    title: "ফিটিং রুম", hint: "যেকোনো জার্সির হ্যাঙ্গারে ট্যাপ করে পরিয়ে দেখুন।", tryAi: "এআই দিয়ে ট্রাই করুন", startOver: "আবার শুরু",
+    browse: "জার্সি দেখুন", aiLink: "এআই ট্রাই-অন", open: "ফিটিং রুম খুলুন", pill: "ট্রাই করুন",
+    disclaimer: "ড্রেস ফর্মে দ্রুত প্রিভিউ, এআই-তৈরি নয়। নিজের গায়ে দেখতে এআই ট্রাই-অন ব্যবহার করুন।",
+  },
   trust: {
+    codShort: "হাতে পেয়ে মূল্য পরিশোধ", deliveryShort: "ঢাকায় ১–২ দিনে", returnsShort: "৭ দিনের সাইজ এক্সচেঞ্জ", qualityShort: "কুইক-ড্রাই পারফরম্যান্স নিট",
     cod: "ক্যাশ অন ডেলিভারি", codBody: "সারা বাংলাদেশে পণ্য হাতে পেয়ে মূল্য পরিশোধ।",
     delivery: "দ্রুত ডেলিভারি", deliveryBody: "ঢাকায় ১–২ দিন, সারা দেশে ২–৪ দিন।",
     returns: "সহজ রিটার্ন", returnsBody: "নন-পার্সোনালাইজড কিটে ৭ দিনের সাইজ এক্সচেঞ্জ।",

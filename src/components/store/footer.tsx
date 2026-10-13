@@ -3,7 +3,6 @@ import { FacebookIcon as Facebook, InstagramIcon as Instagram, YoutubeIcon as Yo
 import type { Settings } from "@/lib/settings";
 import type { Dictionary, Locale } from "@/lib/i18n/dictionaries";
 import { NewsletterForm } from "./newsletter-form";
-import { Logo } from "./logo";
 
 export function Footer({ settings, t, locale, categories, demoData }: { settings: Settings; t: Dictionary; locale: Locale; categories: { slug: string; name: string; nameBn: string | null }[]; demoData: boolean }) {
   const s = settings.footer.social;
@@ -13,10 +12,11 @@ export function Footer({ settings, t, locale, categories, demoData }: { settings
     { href: s.youtube, label: "YouTube", icon: Youtube },
   ].filter((x) => x.href);
   return (
-    <footer className="mt-12 border-t border-border bg-surface">
+    <footer className="mt-10 px-3 md:px-4">
+      <div className="overflow-hidden rounded-t-[1.75rem] bg-surface md:rounded-t-[2.25rem]">
       <div className="container-x grid gap-12 py-16 md:grid-cols-12">
         <div className="md:col-span-4">
-          <Logo name={settings.brand.name} logoUrl={settings.brand.logoUrl} />
+          <Link href="/" className="font-heading text-[20px] font-bold uppercase tracking-[0.32em]">{settings.brand.name}</Link>
           <p className="mt-4 max-w-sm text-sm leading-relaxed text-muted-foreground">{locale === "bn" ? settings.footer.aboutBn : settings.footer.about}</p>
           <div className="mt-8 max-w-sm">
             <p className="mb-2 font-heading text-[15px] font-semibold">{t.home.newsletterTitle}</p>
@@ -66,6 +66,7 @@ export function Footer({ settings, t, locale, categories, demoData }: { settings
           </p>
         )}
       </div>
+      </div>
     </footer>
   );
 }
@@ -73,7 +74,7 @@ export function Footer({ settings, t, locale, categories, demoData }: { settings
 function FooterCol({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div>
-      <p className="mb-4 text-xs font-semibold uppercase tracking-[0.16em]">{title}</p>
+      <p className="mb-4 text-[11.5px] font-medium uppercase tracking-[0.3em] text-accent-ink">{title}</p>
       <ul className="space-y-2.5">{children}</ul>
     </div>
   );

@@ -3,7 +3,7 @@
 import { imgSrc, imgSrcSet } from "@/lib/images";
 import * as React from "react";
 import Link from "next/link";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion } from "framer-motion";
 import { Minus, Plus, ShoppingBag, Trash2, Truck } from "lucide-react";
 import { useStore } from "./store-provider";
 import { Sheet, SheetContent } from "@/components/ui/sheet";

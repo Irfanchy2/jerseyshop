@@ -37,7 +37,7 @@ export function AppearanceEditor({ draft, presets, hasDraft }: { draft: A; prese
   const vars = {
     "--p-bg": c.background, "--p-surface": c.surface, "--p-muted": c.muted, "--p-fg": c.foreground, "--p-mfg": c.mutedForeground, "--p-border": c.border, "--p-accent": c.accent, "--p-afg": c.accentForeground, "--p-sale": c.sale,
     "--p-radius": RADIUS[a.radius], "--p-btn": a.buttonStyle === "sharp" ? "0px" : "999px",
-    "--p-font": a.headingFont === "oswald" ? "var(--font-oswald)" : a.headingFont === "archivo" ? "var(--font-archivo)" : a.headingFont === "inter" ? "var(--font-inter)" : "var(--font-manrope)",
+    "--p-font": a.headingFont === "oswald" ? "var(--font-oswald)" : a.headingFont === "archivo" ? "var(--font-archivo)" : a.headingFont === "inter" ? "var(--font-inter)" : a.headingFont === "jakarta" ? "var(--font-jakarta)" : "var(--font-manrope)",
   } as React.CSSProperties;
   return (
     <div className="grid gap-6 xl:grid-cols-[1fr_440px]">
@@ -68,8 +68,8 @@ export function AppearanceEditor({ draft, presets, hasDraft }: { draft: A; prese
           </ul>
         </section>
         <section className="grid gap-4 rounded-xl border border-border bg-surface p-5 sm:grid-cols-2">
-          <Field label="Heading font" htmlFor="hf"><NativeSelect id="hf" value={a.headingFont} onChange={(e) => set("headingFont", e.target.value as A["headingFont"])}><option value="manrope">Manrope</option><option value="inter">Inter</option><option value="archivo">Archivo</option><option value="oswald">Oswald (condensed)</option></NativeSelect></Field>
-          <Field label="Body font" htmlFor="bf"><NativeSelect id="bf" value={a.bodyFont} onChange={(e) => set("bodyFont", e.target.value as A["bodyFont"])}><option value="inter">Inter</option><option value="manrope">Manrope</option></NativeSelect></Field>
+          <Field label="Heading font" htmlFor="hf"><NativeSelect id="hf" value={a.headingFont} onChange={(e) => set("headingFont", e.target.value as A["headingFont"])}><option value="jakarta">Plus Jakarta Sans</option><option value="manrope">Manrope</option><option value="inter">Inter</option><option value="archivo">Archivo</option><option value="oswald">Oswald (condensed)</option></NativeSelect></Field>
+          <Field label="Body font" htmlFor="bf"><NativeSelect id="bf" value={a.bodyFont} onChange={(e) => set("bodyFont", e.target.value as A["bodyFont"])}><option value="jakarta">Plus Jakarta Sans</option><option value="inter">Inter</option><option value="manrope">Manrope</option></NativeSelect></Field>
           <Field label="Heading case" htmlFor="hc"><NativeSelect id="hc" value={a.headingCase} onChange={(e) => set("headingCase", e.target.value as A["headingCase"])}><option value="normal">Normal</option><option value="uppercase">UPPERCASE</option></NativeSelect></Field>
           <Field label="Corner radius" htmlFor="rad"><NativeSelect id="rad" value={a.radius} onChange={(e) => set("radius", e.target.value as A["radius"])}>{Object.keys(RADIUS).map((r) => <option key={r}>{r}</option>)}</NativeSelect></Field>
           <Field label="Buttons" htmlFor="bs"><NativeSelect id="bs" value={a.buttonStyle} onChange={(e) => set("buttonStyle", e.target.value as A["buttonStyle"])}><option value="solid">Solid pill</option><option value="outline-pill">Outline pill</option><option value="sharp">Sharp</option></NativeSelect></Field>

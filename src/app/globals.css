@@ -5,26 +5,43 @@
  * (see src/components/store/theme-style.tsx). Admin uses its own neutral scale (.admin-theme).
  */
 :root {
-  --background: #f6f4ef;
+  --background: #f4f5f7;
   --surface: #ffffff;
-  --muted: #ebe8e1;
-  --foreground: #121212;
-  --muted-foreground: #6b6760;
-  --border: #dedad2;
-  --accent: #0f5c3a;
+  --muted: #eef0f3;
+  --foreground: #141824;
+  --muted-foreground: #6b7180;
+  --border: #e6e8ec;
+  --accent: #e8742a;
   --accent-foreground: #ffffff;
-  --sale: #c2410c;
+  /* Orange for small text on light surfaces (meets 4.5:1); --accent is for fills and large text. */
+  --accent-ink: #b8501a;
+  --accent-soft: color-mix(in srgb, var(--accent) 11%, var(--surface));
+  --sale: #c2571a;
   --success: #15803d;
   --warning: #b45309;
   --danger: #b91c1c;
-  --radius: 0.75rem;
+  --radius: 1.5rem;
   --radius-button: 999px;
   --section-gap: 6rem;
   --heading-transform: none;
-  --font-heading-family: var(--font-manrope);
-  --font-body-family: var(--font-inter);
+  --font-heading-family: var(--font-jakarta);
+  --font-body-family: var(--font-jakarta);
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+/* Storefront dark mode (toggled from the header, persisted in the `theme` cookie). */
+html.dark {
+  --background: #0d0e11;
+  --surface: #17181d;
+  --muted: #202229;
+  --foreground: #f2f3f5;
+  --muted-foreground: #9aa0ab;
+  --border: #2a2c34;
+  --accent-ink: color-mix(in srgb, var(--accent) 78%, #fff);
+  --accent-soft: color-mix(in srgb, var(--accent) 16%, var(--surface));
+  --sale: color-mix(in srgb, var(--accent) 78%, #fff);
+  color-scheme: dark;
 }
 
 .admin-theme {
@@ -65,6 +82,8 @@
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-sale: var(--sale);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-soft: var(--accent-soft);
   --color-success: var(--success);
   --color-warning: var(--warning);
   --color-danger: var(--danger);
@@ -72,6 +91,7 @@
   --font-heading: var(--font-heading-family), var(--font-bengali), ui-sans-serif, system-ui, sans-serif;
   --font-sans: var(--font-body-family), var(--font-bengali), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-oswald), "Arial Narrow", sans-serif;
+  --font-serif: var(--font-playfair), Georgia, serif;
   --radius-card: var(--radius);
   --radius-btn: var(--radius-button);
   --ease-expo: var(--ease-out-expo);
@@ -93,7 +113,7 @@
   }
   h1, h2, h3, h4, .font-heading {
     font-family: var(--font-heading);
-    letter-spacing: -0.02em;
+    letter-spacing: -0.025em;
     text-transform: var(--heading-transform);
   }
   :focus-visible {
@@ -126,10 +146,10 @@
     .container-x { padding-inline: 3rem; }
   }
   .section-y {
-    padding-block: calc(var(--section-gap) * 0.6);
+    padding-block: calc(var(--section-gap) * 0.4);
   }
   @media (min-width: 768px) {
-    .section-y { padding-block: var(--section-gap); }
+    .section-y { padding-block: calc(var(--section-gap) * 0.6); }
   }
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { scrollbar-width: none; }

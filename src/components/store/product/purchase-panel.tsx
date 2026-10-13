@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion } from "framer-motion";
 import { Heart, Minus, Plus, Sparkles, Shirt, Truck, RotateCcw, Banknote, Check } from "lucide-react";
 import { useStore } from "../store-provider";
 import { Button } from "@/components/ui/button";

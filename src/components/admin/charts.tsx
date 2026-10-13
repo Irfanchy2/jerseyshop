@@ -3,7 +3,7 @@
 import * as React from "react";
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { formatMoney } from "@/lib/money";
-import { useReducedMotion } from "motion/react";
+import { useReducedMotion } from "framer-motion";
 
 /*
  * Single-series charts: one hue (reference categorical slot 1, stepped separately for light/dark),

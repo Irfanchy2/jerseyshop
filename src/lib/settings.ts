@@ -28,8 +28,8 @@ export const settingSchemas = {
       accentForeground: hex,
       sale: hex,
     }),
-    headingFont: z.enum(["manrope", "inter", "archivo", "oswald"]),
-    bodyFont: z.enum(["inter", "manrope"]),
+    headingFont: z.enum(["jakarta", "manrope", "inter", "archivo", "oswald"]),
+    bodyFont: z.enum(["jakarta", "inter", "manrope"]),
     radius: z.enum(["none", "sm", "md", "lg", "full"]),
     buttonStyle: z.enum(["solid", "outline-pill", "sharp"]),
     cardStyle: z.enum(["minimal", "framed", "elevated"]),
@@ -99,6 +99,17 @@ export type SettingKey = keyof typeof settingSchemas;
 export type Settings = { [K in SettingKey]: z.infer<(typeof settingSchemas)[K]> };
 
 export const APPEARANCE_PRESETS: Record<string, Settings["appearance"]["colors"]> = {
+  "studio-light": {
+    background: "#f4f5f7",
+    surface: "#ffffff",
+    muted: "#eef0f3",
+    foreground: "#141824",
+    mutedForeground: "#6b7180",
+    border: "#e6e8ec",
+    accent: "#e8742a",
+    accentForeground: "#ffffff",
+    sale: "#c2571a",
+  },
   "stadium-ivory": {
     background: "#f6f4ef",
     surface: "#ffffff",
@@ -155,19 +166,19 @@ export const DEFAULT_SETTINGS: Settings = {
     address: "House 12, Road 5, Dhanmondi, Dhaka 1205",
   },
   appearance: {
-    preset: "stadium-ivory",
-    colors: APPEARANCE_PRESETS["stadium-ivory"],
-    headingFont: "manrope",
-    bodyFont: "inter",
-    radius: "md",
+    preset: "studio-light",
+    colors: APPEARANCE_PRESETS["studio-light"],
+    headingFont: "jakarta",
+    bodyFont: "jakarta",
+    radius: "full",
     buttonStyle: "solid",
     cardStyle: "minimal",
-    cardImageRatio: "4/5",
+    cardImageRatio: "1/1",
     sectionSpacing: "comfortable",
     headingCase: "normal",
   },
   announcement: {
-    enabled: true,
+    enabled: false,
     messages: [
       { en: "Free delivery on orders over ৳3,000", bn: "৳৩,০০০+ অর্ডারে ফ্রি ডেলিভারি", href: "/shipping-policy" },
       { en: "Cash on Delivery available across Bangladesh", bn: "সারা বাংলাদেশে ক্যাশ অন ডেলিভারি" },

@@ -30,9 +30,12 @@ admin dashboard, AI virtual try‑on integration, interactive 3D personalisation
 ## What's included
 
 **Storefront** (`src/app/(store)`)
-- Homepage driven by the CMS: editorial hero, category cards, best sellers / new arrivals rails, featured collections,
-  personalisation promo with live preview, club & country grid, AI try‑on explainer, trust strip, verified reviews, recently viewed,
-  newsletter. Announcement bar, mega menu, search overlay, language switch (EN/বাংলা), cart drawer.
+- Homepage driven by the CMS ("studio" layout): hero with an animated jersey rack, benefit strip, Edit I · II · III cards,
+  featured collection block, category tiles, "just landed" and best‑seller grids, dark promo banner (shows the real largest live
+  discount via `{maxOff}` and hides itself when nothing is on sale), personalisation promo with live preview, verified reviews,
+  recently viewed. Floating header with Shop dropdown, language pill (EN/বাংলা), light/dark toggle, ⌘K / Ctrl K search, cart drawer.
+- **Fitting room**: a floating "Try it on" panel. The hanger button on any product card puts that jersey on an illustrated dress form
+  (a quick 2D preview, labelled as not AI‑generated) and links to the real AI try‑on for try‑on‑enabled products.
 - Shop & collections with **database‑driven filters** (category, club, national team, season, kit, colour, size, price, availability),
   search, sorting, pagination, quick view, quick add, wishlist, mobile bottom‑sheet filters.
 - Product page: gallery with zoom/lightbox, front/back switch, **3D view**, size guide, colour/size/stock, quantity,
@@ -62,10 +65,11 @@ performance) · Staff & roles · Notifications · System health & jobs · Audit 
 
 The brief pointed to the aniq‑ui “Next.js E‑Commerce Template with Admin Dashboard” demos
 (`ecommerce-clothes-1.aniq-ui.com`, `ecommerce-clothes-1-admin.aniq-ui.com`, `aniq-ui.com/en/templates/next-js-ecommerce-template`).
-**These sites could not be inspected from the build environment** (the hosts did not resolve / were blocked by the network
-policy), and no public description of them was found. The design was therefore built from the written brief:
-a warm off‑white, editorial fashion‑retail look with a single sports accent, Manrope + Inter typography, restrained motion,
-and a clean light/dark admin. No code, assets or branding from those templates were used.
+**These sites could not be inspected from the build environment** (the hosts were blocked by the network policy). The first
+version was built from the written brief; the current storefront ("studio" layout) was then rebuilt from the owner's screenshots of
+the storefront demo: cool light‑grey canvas, white rounded cards, a single orange accent, Plus Jakarta Sans with light/bold
+headline pairs, a floating header and framer‑motion animation throughout. Layout and interaction patterns were recreated in
+original code; no code, imagery, copy or branding from the template were used.
 
 All catalog imagery is **original procedurally generated jersey art** (`src/lib/jersey-art.ts`) for fictional clubs and
 “supporters’ edition” national designs without federation crests. Replace with your own licensed photography via Admin → Products.
@@ -77,7 +81,7 @@ All catalog imagery is **original procedurally generated jersey art** (`src/lib/
 | Layer | Choice |
 |---|---|
 | App | Next.js 16 (App Router, Turbopack), React 19, TypeScript |
-| UI | Tailwind CSS v4, Radix UI primitives (shadcn‑style components in `src/components/ui`), Lucide, Motion, GSAP ScrollTrigger (hero parallax), Embla |
+| UI | Tailwind CSS v4, Radix UI primitives (shadcn‑style components in `src/components/ui`), Lucide, framer‑motion (all storefront animation, respects reduced motion), Embla |
 | 3D | Three.js, React Three Fiber, Drei (procedural jersey mesh + optional licensed GLB) |
 | Data | PostgreSQL + Prisma 6 (`prisma/schema.prisma`, migrations in `prisma/migrations`) |
 | Validation | Zod on every server boundary |
@@ -112,6 +116,8 @@ npm install
 cp .env.example .env                 # fill DATABASE_URL, APP_SECRET, ENCRYPTION_KEY, CRON_SECRET
 npx prisma migrate deploy            # or: npm run db:migrate:dev
 npm run db:seed:demo                 # base config + fictional DEMO catalog/orders (development only)
+# Existing database from before the studio redesign? Switch its homepage + theme (overwrites homepage/appearance edits):
+# npm run db:apply-studio-layout -- --dry   then   npm run db:apply-studio-layout
 npm run dev                          # http://localhost:3000 · admin at /admin
 ```
 
