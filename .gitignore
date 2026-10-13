@@ -46,3 +46,6 @@ next-env.d.ts
 /playwright-report
 
 /.storage-test
+
+# python caches (skill scripts)
+__pycache__/
